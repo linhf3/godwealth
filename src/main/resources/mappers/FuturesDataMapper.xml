@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.godwealth.dao.FuturesDataMapper">
+    <resultMap id="BaseResultMap" type="com.godwealth.entity.FuturesData">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="exchange_code" property="exchangeCode" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.godwealth.entity.FuturesData" extends="BaseResultMap">
+        <result column="data" property="data" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, exchange_code
+  </sql>
+    <sql id="Blob_Column_List">
+    data
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from futures_data
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from futures_data
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.godwealth.entity.FuturesData">
+    insert into futures_data (id, name, exchange_code, 
+      data)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{exchangeCode,jdbcType=VARCHAR}, 
+      #{data,jdbcType=LONGVARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.godwealth.entity.FuturesData">
+        insert into futures_data
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="exchangeCode != null">
+                exchange_code,
+            </if>
+            <if test="data != null">
+                data,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="exchangeCode != null">
+                #{exchangeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="data != null">
+                #{data,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.godwealth.entity.FuturesData">
+        update futures_data
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="exchangeCode != null">
+                exchange_code = #{exchangeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="data != null">
+                data = #{data,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.godwealth.entity.FuturesData">
+    update futures_data
+    set name = #{name,jdbcType=VARCHAR},
+      exchange_code = #{exchangeCode,jdbcType=VARCHAR},
+      data = #{data,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <update id="updateByPrimaryKey" parameterType="com.godwealth.entity.FuturesData">
+    update futures_data
+    set name = #{name,jdbcType=VARCHAR},
+      exchange_code = #{exchangeCode,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <select id="selectAll" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from futures_data
+    </select>
+    <insert id="insertList" parameterType="java.util.List">
+        insert into
+        futures_data (name, exchange_code,
+        data) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.name},#{item.exchangeCode},#{item.data})
+        </foreach>
+    </insert>
+</mapper>

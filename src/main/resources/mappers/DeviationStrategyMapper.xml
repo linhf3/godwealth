@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.godwealth.dao.DeviationStrategyMapper" >
+  <resultMap id="BaseResultMap" type="com.godwealth.entity.DeviationStrategy" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="positive_deviation" property="positiveDeviation" jdbcType="DOUBLE" />
+    <result column="negative_deviation" property="negativeDeviation" jdbcType="DOUBLE" />
+    <result column="add_user" property="addUser" jdbcType="VARCHAR" />
+    <result column="add_date" property="addDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, positive_deviation, negative_deviation, add_user, add_date
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from deviation_strategy
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from deviation_strategy
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.godwealth.entity.DeviationStrategy" >
+    insert into deviation_strategy (id, positive_deviation, negative_deviation, 
+      add_user, add_date)
+    values (#{id,jdbcType=INTEGER}, #{positiveDeviation,jdbcType=DOUBLE}, #{negativeDeviation,jdbcType=DOUBLE}, 
+      #{addUser,jdbcType=VARCHAR}, #{addDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.godwealth.entity.DeviationStrategy" >
+    insert into deviation_strategy
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="positiveDeviation != null" >
+        positive_deviation,
+      </if>
+      <if test="negativeDeviation != null" >
+        negative_deviation,
+      </if>
+      <if test="addUser != null" >
+        add_user,
+      </if>
+      <if test="addDate != null" >
+        add_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="positiveDeviation != null" >
+        #{positiveDeviation,jdbcType=DOUBLE},
+      </if>
+      <if test="negativeDeviation != null" >
+        #{negativeDeviation,jdbcType=DOUBLE},
+      </if>
+      <if test="addUser != null" >
+        #{addUser,jdbcType=VARCHAR},
+      </if>
+      <if test="addDate != null" >
+        #{addDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.godwealth.entity.DeviationStrategy" >
+    update deviation_strategy
+    <set >
+      <if test="positiveDeviation != null" >
+        positive_deviation = #{positiveDeviation,jdbcType=DOUBLE},
+      </if>
+      <if test="negativeDeviation != null" >
+        negative_deviation = #{negativeDeviation,jdbcType=DOUBLE},
+      </if>
+      <if test="addUser != null" >
+        add_user = #{addUser,jdbcType=VARCHAR},
+      </if>
+      <if test="addDate != null" >
+        add_date = #{addDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.godwealth.entity.DeviationStrategy" >
+    update deviation_strategy
+    set positive_deviation = #{positiveDeviation,jdbcType=DOUBLE},
+      negative_deviation = #{negativeDeviation,jdbcType=DOUBLE},
+      add_user = #{addUser,jdbcType=VARCHAR},
+      add_date = #{addDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

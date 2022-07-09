@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.godwealth.dao.StockCodeMapper">
+    <resultMap id="BaseResultMap" type="com.godwealth.entity.StockCode">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="stock_code" property="stockCode" jdbcType="VARCHAR"/>
+        <result column="category" property="category" jdbcType="CHAR"/>
+        <result column="sw_effective" property="swEffective" jdbcType="CHAR"/>
+        <result column="memo" property="memo" jdbcType="VARCHAR"/>
+        <result column="exchange_code" property="exchangeCode" jdbcType="VARCHAR"/>
+        <result column="add_user" property="addUser" jdbcType="VARCHAR"/>
+        <result column="add_date" property="addDate" jdbcType="TIMESTAMP"/>
+        <result column="add_user_id" property="addUserId" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, stock_code, category, sw_effective, memo, exchange_code, add_user, add_date, 
+    add_user_id
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from stock_code
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from stock_code
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.godwealth.entity.StockCode">
+    insert into stock_code (id, name, stock_code, 
+      category, sw_effective, memo, 
+      exchange_code, add_user, add_date, 
+      add_user_id)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{stockCode,jdbcType=VARCHAR}, 
+      #{category,jdbcType=CHAR}, #{swEffective,jdbcType=CHAR}, #{memo,jdbcType=VARCHAR}, 
+      #{exchangeCode,jdbcType=VARCHAR}, #{addUser,jdbcType=VARCHAR}, #{addDate,jdbcType=TIMESTAMP}, 
+      #{addUserId,jdbcType=INTEGER})
+  </insert>
+    <insert id="insertSelective" parameterType="com.godwealth.entity.StockCode">
+        insert into stock_code
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="stockCode != null">
+                stock_code,
+            </if>
+            <if test="category != null">
+                category,
+            </if>
+            <if test="swEffective != null">
+                sw_effective,
+            </if>
+            <if test="memo != null">
+                memo,
+            </if>
+            <if test="exchangeCode != null">
+                exchange_code,
+            </if>
+            <if test="addUser != null">
+                add_user,
+            </if>
+            <if test="addDate != null">
+                add_date,
+            </if>
+            <if test="addUserId != null">
+                add_user_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="stockCode != null">
+                #{stockCode,jdbcType=VARCHAR},
+            </if>
+            <if test="category != null">
+                #{category,jdbcType=CHAR},
+            </if>
+            <if test="swEffective != null">
+                #{swEffective,jdbcType=CHAR},
+            </if>
+            <if test="memo != null">
+                #{memo,jdbcType=VARCHAR},
+            </if>
+            <if test="exchangeCode != null">
+                #{exchangeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="addUser != null">
+                #{addUser,jdbcType=VARCHAR},
+            </if>
+            <if test="addDate != null">
+                #{addDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="addUserId != null">
+                #{addUserId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.godwealth.entity.StockCode">
+        update stock_code
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="stockCode != null">
+                stock_code = #{stockCode,jdbcType=VARCHAR},
+            </if>
+            <if test="category != null">
+                category = #{category,jdbcType=CHAR},
+            </if>
+            <if test="swEffective != null">
+                sw_effective = #{swEffective,jdbcType=CHAR},
+            </if>
+            <if test="memo != null">
+                memo = #{memo,jdbcType=VARCHAR},
+            </if>
+            <if test="exchangeCode != null">
+                exchange_code = #{exchangeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="addUser != null">
+                add_user = #{addUser,jdbcType=VARCHAR},
+            </if>
+            <if test="addDate != null">
+                add_date = #{addDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="addUserId != null">
+                add_user_id = #{addUserId,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.godwealth.entity.StockCode">
+    update stock_code
+    set name = #{name,jdbcType=VARCHAR},
+      stock_code = #{stockCode,jdbcType=VARCHAR},
+      category = #{category,jdbcType=CHAR},
+      sw_effective = #{swEffective,jdbcType=CHAR},
+      memo = #{memo,jdbcType=VARCHAR},
+      exchange_code = #{exchangeCode,jdbcType=VARCHAR},
+      add_user = #{addUser,jdbcType=VARCHAR},
+      add_date = #{addDate,jdbcType=TIMESTAMP},
+      add_user_id = #{addUserId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <delete id="deleteBystockCode" parameterType="java.lang.String">
+     delete from stock_code
+    where stock_code = #{stockCode,jdbcType=VARCHAR}
+  </delete>
+
+    <select id="selectByCondition" parameterType="com.godwealth.entity.StockCode"
+            resultType="com.godwealth.entity.StockCode">
+        select
+        <include refid="Base_Column_List"/>
+        from stock_code
+        <where>
+            <if test="stockCode != null and '' != stockCode">
+                stock_code = #{stockCode,jdbcType=VARCHAR}
+            </if>
+            <if test="swEffective != null and '' != swEffective">
+                and sw_effective = #{swEffective,jdbcType=CHAR}
+            </if>
+            <if test="category != null and '' != category">
+                and category = #{category,jdbcType=CHAR}
+            </if>
+        </where>
+
+    </select>
+
+    <insert id="insertList" parameterType="java.util.List">
+        insert into
+        stock_code (name,stock_code,category,sw_effective,memo,exchange_code,add_user,add_date)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.name},#{item.stockCode},#{item.category},#{item.swEffective},#{item.memo},
+            #{item.exchangeCode},#{item.addUser},now())
+        </foreach>
+    </insert>
+
+
+</mapper>

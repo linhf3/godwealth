@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.godwealth.dao.StockLogMapper" >
+  <resultMap id="BaseResultMap" type="com.godwealth.entity.StockLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="stock_code" property="stockCode" jdbcType="VARCHAR" />
+    <result column="sw_effective" property="swEffective" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="price" property="price" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="buy_sale_date" property="buySaleDate" jdbcType="TIMESTAMP" />
+    <result column="difference" property="difference" jdbcType="VARCHAR" />
+    <result column="category" property="category" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, stock_code, sw_effective, create_date, price, type, buy_sale_date, difference, 
+    category
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from stock_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from stock_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.godwealth.entity.StockLog" >
+    insert into stock_log (id, stock_code, sw_effective, 
+      create_date, price, type, 
+      buy_sale_date, difference, category
+      )
+    values (#{id,jdbcType=INTEGER}, #{stockCode,jdbcType=VARCHAR}, #{swEffective,jdbcType=CHAR}, 
+      #{createDate,jdbcType=DATE}, #{price,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, 
+      #{buySaleDate,jdbcType=TIMESTAMP}, #{difference,jdbcType=VARCHAR}, #{category,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.godwealth.entity.StockLog" >
+    insert into stock_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="stockCode != null" >
+        stock_code,
+      </if>
+      <if test="swEffective != null" >
+        sw_effective,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="buySaleDate != null" >
+        buy_sale_date,
+      </if>
+      <if test="difference != null" >
+        difference,
+      </if>
+      <if test="category != null" >
+        category,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="stockCode != null" >
+        #{stockCode,jdbcType=VARCHAR},
+      </if>
+      <if test="swEffective != null" >
+        #{swEffective,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="buySaleDate != null" >
+        #{buySaleDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="difference != null" >
+        #{difference,jdbcType=VARCHAR},
+      </if>
+      <if test="category != null" >
+        #{category,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.godwealth.entity.StockLog" >
+    update stock_log
+    <set >
+      <if test="stockCode != null" >
+        stock_code = #{stockCode,jdbcType=VARCHAR},
+      </if>
+      <if test="swEffective != null" >
+        sw_effective = #{swEffective,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=DATE},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="buySaleDate != null" >
+        buy_sale_date = #{buySaleDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="difference != null" >
+        difference = #{difference,jdbcType=VARCHAR},
+      </if>
+      <if test="category != null" >
+        category = #{category,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.godwealth.entity.StockLog" >
+    update stock_log
+    set stock_code = #{stockCode,jdbcType=VARCHAR},
+      sw_effective = #{swEffective,jdbcType=CHAR},
+      create_date = #{createDate,jdbcType=DATE},
+      price = #{price,jdbcType=VARCHAR},
+      type = #{type,jdbcType=CHAR},
+      buy_sale_date = #{buySaleDate,jdbcType=TIMESTAMP},
+      difference = #{difference,jdbcType=VARCHAR},
+      category = #{category,jdbcType=CHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByCondition" resultType="com.godwealth.entity.StockLog"
+          parameterType="com.godwealth.entity.StockLog">
+    select
+    <include refid="Base_Column_List" />
+    from stock_log
+    <where>
+      <if test="stockCode != null and '' != stockCode" >
+        stock_code = #{stockCode,jdbcType=VARCHAR}
+      </if>
+      <if test="swEffective != null and '' != swEffective" >
+        and sw_effective = #{swEffective,jdbcType=CHAR}
+      </if>
+      <if test="type != null and '' != type" >
+        and type = #{type,jdbcType=CHAR}
+      </if>
+      <if test="category != null and '' != category" >
+        and category = #{category,jdbcType=CHAR}
+      </if>
+      <if test="createDate != null" >
+        and createDate = DATE_FORMAT(#{createDate,jdbcType=DATE}, '%Y-%m-%d')
+      </if>
+    </where>
+  </select>
+  <select id="getTodayToSellstockLog" resultType="com.godwealth.entity.StockLog"
+          parameterType="com.godwealth.entity.StockLog">
+    select
+    <include refid="Base_Column_List" />
+    from stock_log
+    <where>
+      <if test="swEffective != null and '' != swEffective" >
+        sw_effective = #{swEffective,jdbcType=CHAR}
+      </if>
+      <if test="category != null and '' != category" >
+        category = #{category,jdbcType=CHAR}
+      </if>
+      <if test="addDate != null" >
+        and create_date &lt; DATE_FORMAT(#{createDate,jdbcType=DATE}, '%Y-%m-%d')
+      </if>
+    </where>
+
+  </select>
+  <select id="getTodaysBuystockLog" resultType="com.godwealth.entity.StockLog"
+          parameterType="com.godwealth.entity.StockLog">
+    select
+    <include refid="Base_Column_List" />
+    from stock_log
+    <where>
+      <if test="sw_effective != null and '' != sw_effective" >
+        sw_effective = #{swEffective,jdbcType=CHAR}
+      </if>
+      <if test="category != null and '' != category" >
+        category = #{category,jdbcType=CHAR}
+      </if>
+      <if test="addDate != null" >
+        and create_date = DATE_FORMAT(#{createDate,jdbcType=DATE}, '%Y-%m-%d')
+      </if>
+    </where>
+
+  </select>
+
+</mapper>
