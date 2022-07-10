@@ -25,4 +25,7 @@ public class CoreAlgorithmContet {
         return coreAlgorithmMap.get(beanName).deviationManyDaysRate(list);
     };
 
+    public Map<String, Object> deviationRateCore(String beanName, String code) {
+        return coreAlgorithmMap.get(beanName).deviationRateCore(code);
+    };
 }

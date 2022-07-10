@@ -24,5 +24,12 @@ public interface CoreAlgorithm {
      */
     String deviationManyDaysRate(List<List> list);
 
+    /**
+     * 股票核心计算方法，计算五日内当前偏离率
+     * @param code（计算结果有出入，慎用）
+     * @return double
+     */
+    Map<String, Object> deviationRateCore(String code);
+
 
 }

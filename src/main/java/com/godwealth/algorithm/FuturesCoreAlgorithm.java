@@ -136,4 +136,9 @@ public class FuturesCoreAlgorithm implements CoreAlgorithm {
         }
         return "";
     }
+
+    @Override
+    public Map<String, Object> deviationRateCore(String code) {
+        return null;
+    }
 }
