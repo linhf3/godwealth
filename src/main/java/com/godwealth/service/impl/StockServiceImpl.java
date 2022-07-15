@@ -1,6 +1,7 @@
 package com.godwealth.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.godwealth.dao.DeviationStrategyMapper;
 import com.godwealth.dao.StockCodeMapper;
 import com.godwealth.dao.StockLogMapper;
@@ -9,9 +10,11 @@ import com.godwealth.entity.StockCode;
 import com.godwealth.entity.StockLog;
 import com.godwealth.service.StockService;
 import com.godwealth.utils.Constant;
+import com.godwealth.utils.RedisUtils;
 import com.godwealth.utils.SendMail;
 import com.godwealth.utils.SortUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -44,6 +47,9 @@ public class StockServiceImpl implements StockService {
     @Autowired
     private StockLogMapper stockLogMapper;
 
+    @Autowired
+    private RedisUtils redisUtils;
+
     @Override
     public List<Map<String, Object>> stockData() throws GeneralSecurityException, MessagingException {
         StockCode stockCode = new StockCode();
@@ -53,7 +59,15 @@ public class StockServiceImpl implements StockService {
         List<Map<String,Object>> result = new ArrayList<>();
         StringBuilder sb = new StringBuilder("");
         //查询策略
-        DeviationStrategy deviationStrategy = deviationStrategyMapper.selectByPrimaryKey(1);
+        Object deviationStrategyString = redisUtils.get("deviationStrategyString");
+        DeviationStrategy deviationStrategy  = null;
+        if (ObjectUtils.isEmpty(deviationStrategyString)){
+            deviationStrategy = deviationStrategyMapper.selectByPrimaryKey(1);
+            redisUtils.set("allStocksDataList",JSON.toJSONString(deviationStrategy));
+        }else {
+            deviationStrategy = JSONObject.parseObject((String) deviationStrategyString, DeviationStrategy.class);
+        }
+
         for (int i = 0; i < stockCodes.size(); i++) {
             HashMap<String, Object> hash = new HashMap<>();
             String code = stockCodes.get(i).getStockCode();
@@ -125,7 +139,9 @@ public class StockServiceImpl implements StockService {
             qStockLog.setSwEffective("有效");
             qStockLog.setType("买");
             qStockLog.setStockCode((String) hash.get("code"));
+
             List<StockLog> stockLogs = stockLogMapper.selectByCondition(qStockLog);
+
             StockLog selectStockLog = null;
             if (!CollectionUtils.isEmpty(stockLogs)){
                 selectStockLog = stockLogs.get(0);
@@ -225,8 +241,6 @@ public class StockServiceImpl implements StockService {
     @Override
     public List<StockCode> querySockCodeList() {
         StockCode stockCode = new StockCode();
-        stockCode.setSwEffective("有效");
-        stockCode.setCategory("1");
         return stockCodeMapper.selectByCondition(stockCode);
     }
 

@@ -24,6 +24,28 @@ public class StockCode implements Serializable {
 
     private Integer addUserId;
 
+    private Integer downwardDeviation;
+
+    private Integer deviation;
+
+    public Integer getDownwardDeviation() {
+        return downwardDeviation;
+    }
+
+    public void setDownwardDeviation(Integer downwardDeviation) {
+        this.downwardDeviation = downwardDeviation;
+    }
+
+    public Integer getDeviation() {
+        return deviation;
+    }
+
+    public void setDeviation(Integer deviation) {
+        this.deviation = deviation;
+    }
+
+
+
     private static final long serialVersionUID = 1L;
 
     public Integer getId() {

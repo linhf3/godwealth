@@ -1,6 +1,7 @@
 package com.godwealth.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.godwealth.algorithm.CoreAlgorithmContet;
 import com.godwealth.dao.FuturesDataMapper;
 import com.godwealth.dao.StockCodeMapper;
@@ -9,7 +10,9 @@ import com.godwealth.entity.StockCode;
 import com.godwealth.service.FuturesService;
 import com.godwealth.utils.Constant;
 import com.godwealth.utils.HttpUtils;
+import com.godwealth.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.beans.BeanUtils;
@@ -40,6 +43,9 @@ public class FuturesServiceImpl implements FuturesService {
     @Autowired
     private CoreAlgorithmContet coreAlgorithmContet;
 
+    @Autowired
+    private RedisUtils redisUtils;
+
     @Override
     public List<Map<String, Object>> futuresData() throws IOException {
         //1.查询有效配置
@@ -47,8 +53,17 @@ public class FuturesServiceImpl implements FuturesService {
         stockCode.setCategory("2");
         stockCode.setSwEffective("有效");
         List<StockCode> stockCodes = stockCodeMapper.selectByCondition(stockCode);
+
         //2.查询库信息
-        List<FuturesData> futuresDataList = futuresDataMapper.selectAll();
+        Object allFuturesDataList = redisUtils.get("allFuturesDataList");
+        List<FuturesData> futuresDataList  = null;
+        if (StringUtils.isBlank((CharSequence) allFuturesDataList)){
+            futuresDataList = futuresDataMapper.selectAll();
+            redisUtils.set("allFuturesDataList",JSON.toJSONString(futuresDataList));
+        }else {
+            futuresDataList = JSONObject.parseArray((String) allFuturesDataList, FuturesData.class);
+        }
+
         //3.循环爬数据并计算封装到list中
         LinkedList<Map<String, Object>> list = new LinkedList<>();
         if (!CollectionUtils.isEmpty(stockCodes)) {
@@ -98,13 +113,22 @@ public class FuturesServiceImpl implements FuturesService {
     @Override
     public void updateFuturesData() {
         //1.查询库信息
-        List<FuturesData> futuresDataList = futuresDataMapper.selectAll();
+        Object allFuturesDataList = redisUtils.get("allFuturesDataList");
+        List<FuturesData> futuresDataList  = null;
+        if (ObjectUtils.isEmpty(allFuturesDataList)){
+            futuresDataList = futuresDataMapper.selectAll();
+            redisUtils.set("allFuturesDataList",JSON.toJSONString(futuresDataList));
+        }else {
+            futuresDataList = JSONObject.parseArray((String) allFuturesDataList, FuturesData.class);
+        }
+
         //2.爬数据
         List<String> linkedList = new LinkedList<>();
         linkedList.add("113");
         linkedList.add("114");
         linkedList.add("115");
         LinkedList<FuturesData> futuresDataLinkedList = new LinkedList<>();
+        List<FuturesData> finalFuturesDataList = futuresDataList;
         linkedList.forEach(s ->{
             Map urlMap = new HashMap<>();
             urlMap.put("place",s);
@@ -137,7 +161,7 @@ public class FuturesServiceImpl implements FuturesService {
                     //获取爬取的数据集
                     Map dataMap = (Map) nodes.get("data");
                     List trendsList = (List) dataMap.get("trends");
-                    if (CollectionUtils.isEmpty(futuresDataList)){//需要批量插入
+                    if (CollectionUtils.isEmpty(finalFuturesDataList)){//需要批量插入
                         List<List> futuresDatasLinkedList = new LinkedList<>();
                         FuturesData futuresData = new FuturesData();
                         futuresData.setName(name);
@@ -148,7 +172,7 @@ public class FuturesServiceImpl implements FuturesService {
                         futuresDataLinkedList.add(futuresData);
                         log.debug(futuresData.toString());
                     }else {  //更新/插入
-                        for (FuturesData f : futuresDataList) {
+                        for (FuturesData f : finalFuturesDataList) {
                             if (exchangeCode.equals(f.getExchangeCode())) {
                                 FuturesData futuresData = new FuturesData();
                                 BeanUtils.copyProperties(f,futuresData);
