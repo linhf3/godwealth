@@ -18,7 +18,6 @@ import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -48,7 +47,9 @@ public class FuturesServiceImpl implements FuturesService {
 
     @Override
     public Map<String,Object> futuresData() throws IOException {
-        HashMap<String, Object> resultMap = new HashMap<>();
+
+        Map<String, Object> resultMap = new HashMap<>();
+        StringBuilder sb = new StringBuilder("");
         //1.查询有效配置
         Object futuresEffectiveList = redisUtils.get("futuresEffectiveList");
         List<StockCode> stockCodes = null;
@@ -57,23 +58,26 @@ public class FuturesServiceImpl implements FuturesService {
             stockCode.setCategory("2");
             stockCode.setSwEffective("有效");
             stockCodes = stockCodeMapper.selectByCondition(stockCode);
-            redisUtils.set("futuresEffectiveList",JSON.toJSONString(stockCodes));
+            if(!CollectionUtils.isEmpty(stockCodes)){
+                redisUtils.set("futuresEffectiveList",JSON.toJSONString(stockCodes));
+            }
         }else {
             stockCodes = JSONObject.parseArray((String) futuresEffectiveList, StockCode.class);
         }
 
         //2.查询库信息
-        Object allFuturesDataList = redisUtils.get("allFuturesDataList");
-        List<FuturesData> futuresDataList  = null;
-        if (StringUtils.isBlank((CharSequence) allFuturesDataList)){
-            futuresDataList = futuresDataMapper.selectAll();
-            redisUtils.set("allFuturesDataList",JSON.toJSONString(futuresDataList));
-        }else {
-            futuresDataList = JSONObject.parseArray((String) allFuturesDataList, FuturesData.class);
-        }
+//        Object allFuturesDataList = redisUtils.get("allFuturesDataList");
+//        List<FuturesData> futuresDataList  = null;
+//        if (StringUtils.isBlank((CharSequence) allFuturesDataList)){
+//            futuresDataList = futuresDataMapper.selectAll();
+//            redisUtils.set("allFuturesDataList",JSON.toJSONString(futuresDataList));
+//        }else {
+//            futuresDataList = JSONObject.parseArray((String) allFuturesDataList, FuturesData.class);
+//        }
 
         //3.循环爬数据并计算封装到list中
         LinkedList<Map<String, Object>> list = new LinkedList<>();
+        long startTime = System.currentTimeMillis();
         if (!CollectionUtils.isEmpty(stockCodes)) {
             for (int i = 0; i < stockCodes.size(); i++) {
                 StockCode stockCodeF = stockCodes.get(i);
@@ -86,33 +90,50 @@ public class FuturesServiceImpl implements FuturesService {
                 //数据集
                 Map map = (Map) node.get("data");
                 Map<String, Object> reMap = coreAlgorithmContet.deviationTheDayRate("futuresCoreAlgorithm", map);
-                //获取五日偏离
-                try {
-                    if (!CollectionUtils.isEmpty(futuresDataList)) {
-                        String exchangeCode = stockCodeF.getExchangeCode();
-                        for (int j = 0; j < futuresDataList.size(); j++) {
-                            FuturesData futuresData = futuresDataList.get(j);
-                            if (exchangeCode.equals(futuresData.getExchangeCode())) {
-                                List trendsList = (List) map.get("trends");
-                                List<List> dataList = JSON.parseArray(futuresData.getData(), List.class);
-                                if (!CollectionUtils.isEmpty(dataList) && !CollectionUtils.isEmpty(dataList.get(0))) {
-                                    dataList.add(trendsList);
-                                    String v = coreAlgorithmContet.deviationRateCore("futuresCoreAlgorithm", dataList);
-                                    reMap.put("fProportion", v);
-                                }
-                                break;
-                            }
-                        }
-                    } else {
-                        reMap.put("fProportion", "");
-                    }
-                } catch (Exception e) {
-                    log.debug("错误信息：{}", e);
+                String proportion = (String) reMap.get("proportion");
+                Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
+                if (null == stockCodeF.getDownwardDeviation()){
+                    stockCodeF.setDownwardDeviation(-100);
                 }
+                if (null == stockCodeF.getDeviation()){
+                    stockCodeF.setDeviation(100);
+                }
+                if (proportionDouble<=stockCodeF.getDownwardDeviation()){
+                    reMap.put("positiveNegativeFlag",-1);
+                }else if (proportionDouble>=stockCodeF.getDeviation()){
+                    reMap.put("positiveNegativeFlag",1);
+                }else {
+                    reMap.put("positiveNegativeFlag",0);
+                }
+                //获取五日偏离
+//                try {
+//                    if (!CollectionUtils.isEmpty(futuresDataList)) {
+//                        String exchangeCode = stockCodeF.getExchangeCode();
+//                        for (int j = 0; j < futuresDataList.size(); j++) {
+//                            FuturesData futuresData = futuresDataList.get(j);
+//                            if (exchangeCode.equals(futuresData.getExchangeCode())) {
+//                                List trendsList = (List) map.get("trends");
+//                                List<List> dataList = JSON.parseArray(futuresData.getData(), List.class);
+//                                if (!CollectionUtils.isEmpty(dataList) && !CollectionUtils.isEmpty(dataList.get(0))) {
+//                                    dataList.add(trendsList);
+//                                    String v = coreAlgorithmContet.deviationRateCore("futuresCoreAlgorithm", dataList);
+//                                    reMap.put("fProportion", v);
+//                                }
+//                                break;
+//                            }
+//                        }
+//                    } else {
+//                        reMap.put("fProportion", "");
+//                    }
+//                } catch (Exception e) {
+//                    log.debug("错误信息：{}", e);
+//                }
                 list.add(reMap);
             }
         }
         resultMap.put("resultList",list);
+        long endTime = System.currentTimeMillis();
+        log.debug("执行时长：{}",endTime-startTime);
         log.debug("期货：{}",resultMap);
         return resultMap;
     }

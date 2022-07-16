@@ -3,7 +3,7 @@ package com.godwealth.service;
 import com.godwealth.entity.ProportionLog;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -16,6 +16,6 @@ public interface ProportionLogService {
     void collectStockDeviationLogs();
 
     //查询数据
-    List<ProportionLog> selectByCondition(ProportionLog proportionLog);
+    Map<String, Object> selectByCondition(ProportionLog proportionLog);
 
 }

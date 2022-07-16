@@ -13,10 +13,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Repository
@@ -71,8 +68,10 @@ public class ProportionLogServiceImpl implements ProportionLogService {
     }
 
     @Override
-    public List<ProportionLog> selectByCondition(ProportionLog proportionLog) {
-        return proportionLogMapper.selectByCondition(proportionLog);
+    public Map<String, Object> selectByCondition(ProportionLog proportionLog) {
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("resultList",proportionLogMapper.selectByCondition(proportionLog));
+        return resultMap;
     }
 
 

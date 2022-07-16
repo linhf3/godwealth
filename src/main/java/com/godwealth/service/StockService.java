@@ -1,9 +1,6 @@
 package com.godwealth.service;
 
-import com.godwealth.entity.ProportionLog;
 import com.godwealth.entity.StockCode;
-import com.godwealth.entity.StockLog;
-import com.godwealth.utils.CommonResult;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
