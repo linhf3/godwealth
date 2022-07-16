@@ -68,63 +68,11 @@ public class StockControllerTest {
 
     @Test
     public void test3() throws Exception{
-        List<String> objects = new ArrayList<>();
-        objects.add("245343454");
-        redisUtils.set("name",JSON.toJSONString(objects));
-        Object name = redisUtils.get("name");
-        List<String> name1 = JSONObject.parseArray((String) name, String.class);
-        System.out.println(name);
+        proportionLogService.collectStockDeviationLogs();
     }
     @org.junit.Test
     public void test2(){
-        LinkedList<String> linkedList = new LinkedList<>();
-        linkedList.add("113");
-        linkedList.add("114");
-        linkedList.add("115");
-        LinkedList<StockCode> stockCodeLinkedList = new LinkedList<>();
-        linkedList.forEach(s ->{
-            Map urlMap = new HashMap<>();
-            urlMap.put("place",s);
-            //发送http请求
-            String rx = null;
-            try {
-                rx = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.FUTURESMAINFORCEURL), null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Map node = (Map) JSON.parse(rx);
-            List<Map<String,Object>> list = (List<Map<String, Object>>) node.get("list");
-            //数据集
-            System.out.println(list.toArray());
-            list.forEach(map -> {
-                String name = (String) map.get("name");
-                if (name.contains("主力")&&!name.contains("次")){
-                    StockCode stockCode = new StockCode();
-                    stockCode.setName(name);
-                    String dm = (String)map.get("dm");
-                    stockCode.setStockCode(dm);
-                    stockCode.setCategory("2");
-                    stockCode.setSwEffective("无效");
-                    stockCode.setMemo(name);
-                    stockCode.setExchangeCode(new StringBuilder(s).append(".").append(dm).toString());
-                    stockCode.setAddUser("admin");
-                    stockCodeLinkedList.add(stockCode);
-                }
-            });
-        });
-        log.debug("list:{}",stockCodeLinkedList);
-        System.out.println(stockCodeLinkedList.toArray());
-        for (int i = 0; i < stockCodeLinkedList.size(); i++) {
-            StockCode stockCode = stockCodeLinkedList.get(i);
-            log.debug("llll:{}",stockCodeLinkedList.get(i).getMemo());
-            StockCode quStockCode = stockCodeMapper.selectByName(stockCode.getName());
-            if (null == quStockCode){
-                stockCodeMapper.insert(quStockCode);
-            }else {
-                stockCodeMapper.updateByName(quStockCode);
-            }
-        }
-        //stockCodeMapper.insertList(stockCodeLinkedList);
+
     }
 
 

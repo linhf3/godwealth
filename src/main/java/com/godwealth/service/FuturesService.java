@@ -21,4 +21,9 @@ public interface FuturesService {
      */
     void updateFuturesData();
 
+    /**
+     * 更新期货源数据（待以后数据异常使用）
+     */
+    void updateFuturesSourceData();
+
 }
