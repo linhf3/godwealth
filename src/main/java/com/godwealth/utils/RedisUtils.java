@@ -330,6 +330,38 @@ public class RedisUtils {
         return redisTemplate.opsForHash().delete(key, hashKeys);
     }
 
+    /**
+     * 删除指定Key
+     *
+     * @param key
+     * @return 是否成功删除
+     */
+    public boolean delete(String key) {
+        return redisTemplate.delete(key);
+    }
+
+    /**
+     * 删除指定Key结尾的
+     *
+     * @param key
+     * @return 成功删除个数
+     */
+    public Long deleteEndWith(String key) {
+        Set<String> keys = redisTemplate.keys("*"+key);
+        return redisTemplate.delete(keys);
+    }
+
+    /**
+     * 删除指定Key开头的
+     *
+     * @param key
+     * @return 成功删除个数
+     */
+    public Long deleteStartWith(String key) {
+        Set<String> keys = redisTemplate.keys(key+"*");
+        return redisTemplate.delete(keys);
+    }
+
 
     /**
      * 清空缓存

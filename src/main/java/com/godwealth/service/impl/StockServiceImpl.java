@@ -259,7 +259,10 @@ public class StockServiceImpl implements StockService {
     @Override
     public Map<String,Object> insertSelective(StockCode stockCode) {
         Map<String, Object> resultMap = new HashMap<>();
-        redisUtils.flushDb();
+        redisUtils.delete("stocksEffectiveList");
+        redisUtils.delete("futuresEffectiveList");
+        redisUtils.delete("allFuturesDataList");
+        redisUtils.deleteEndWith("_buy_log");
         int resultNumber = stockCodeMapper.insertSelective(stockCode);
         resultMap.put("resultNumber",resultNumber);
         return resultMap;
@@ -280,7 +283,10 @@ public class StockServiceImpl implements StockService {
     @Override
     public Map<String,Object> updateByStockCode(StockCode stockCode) {
         Map<String, Object> resultMap = new HashMap<>();
-        redisUtils.flushDb();
+        redisUtils.delete("stocksEffectiveList");
+        redisUtils.delete("futuresEffectiveList");
+        redisUtils.delete("allFuturesDataList");
+        redisUtils.deleteEndWith("_buy_log");
         int resultNumber = stockCodeMapper.updateByStockCode(stockCode);
         resultMap.put("resultNumber",resultNumber);
         return resultMap;

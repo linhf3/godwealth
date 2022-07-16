@@ -72,7 +72,9 @@ public class StockControllerTest {
     }
     @org.junit.Test
     public void test2(){
-
+        redisUtils.set("sss_buy_log","3333");
+        Long buy_log = redisUtils.deleteEndWith("_buy_log");
+        log.debug("sss:{}",buy_log);
     }
 
 
