@@ -55,14 +55,14 @@ public class StockController {
         return new CommonResult(200,"成功");
     }
 
-    @GetMapping("/querySockCodeList")
-    public CommonResult querySockCodeList(){
-        return new CommonResult(200,"成功",stockService.querySockCodeList());
+    @GetMapping("/querySockCodeList/{vars}")
+    public CommonResult querySockCodeList(@PathVariable("vars")String vars){
+        return new CommonResult(200,"成功",stockService.querySockCodeList(vars));
     }
 
     @PostMapping("/updateStockCode")
     public CommonResult updateStockCode(@RequestBody StockCode stockCode){
-        return new CommonResult(200,"成功",stockService.updateById(stockCode));
+        return new CommonResult(200,"成功",stockService.updateByStockCode(stockCode));
     }
 
 

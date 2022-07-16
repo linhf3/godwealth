@@ -3,6 +3,7 @@ package com.godwealth.service;
 import com.godwealth.entity.ProportionLog;
 import com.godwealth.entity.StockCode;
 import com.godwealth.entity.StockLog;
+import com.godwealth.utils.CommonResult;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Service
 public interface StockService {
 
-    List<Map<String,Object>> stockData() throws GeneralSecurityException, MessagingException;
+    Map<String,Object> stockData() throws GeneralSecurityException, MessagingException;
 
     void insert(String code);
 
@@ -26,10 +27,10 @@ public interface StockService {
 
     List<StockCode> query();
 
-    int insertSelective(StockCode stockCode);
+    Map<String,Object> insertSelective(StockCode stockCode);
 
-    List<StockCode> querySockCodeList();
+    Map<String,Object> querySockCodeList(String vars);
 
-    int updateById(StockCode stockCode);
+    Map<String,Object> updateByStockCode(StockCode stockCode);
 
 }

@@ -9,7 +9,7 @@ spring:
         max-idle: 8
         min-idle: 8
         max-wait: 8
-      shutdown-timeout: 6000ms
+      shutdown-timeout: 20000ms
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://175.178.184.40:3306/godwealth?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true

@@ -47,12 +47,20 @@ public class FuturesServiceImpl implements FuturesService {
     private RedisUtils redisUtils;
 
     @Override
-    public List<Map<String, Object>> futuresData() throws IOException {
+    public Map<String,Object> futuresData() throws IOException {
+        HashMap<String, Object> resultMap = new HashMap<>();
         //1.查询有效配置
-        StockCode stockCode = new StockCode();
-        stockCode.setCategory("2");
-        stockCode.setSwEffective("有效");
-        List<StockCode> stockCodes = stockCodeMapper.selectByCondition(stockCode);
+        Object futuresEffectiveList = redisUtils.get("futuresEffectiveList");
+        List<StockCode> stockCodes = null;
+        if(StringUtils.isBlank((CharSequence) futuresEffectiveList)){
+            StockCode stockCode = new StockCode();
+            stockCode.setCategory("2");
+            stockCode.setSwEffective("有效");
+            stockCodes = stockCodeMapper.selectByCondition(stockCode);
+            redisUtils.set("futuresEffectiveList",JSON.toJSONString(stockCodes));
+        }else {
+            stockCodes = JSONObject.parseArray((String) futuresEffectiveList, StockCode.class);
+        }
 
         //2.查询库信息
         Object allFuturesDataList = redisUtils.get("allFuturesDataList");
@@ -104,7 +112,9 @@ public class FuturesServiceImpl implements FuturesService {
                 list.add(reMap);
             }
         }
-        return list;
+        resultMap.put("resultList",list);
+        log.debug("期货：{}",resultMap);
+        return resultMap;
     }
 
     /**

@@ -139,18 +139,13 @@
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.godwealth.entity.StockCode">
+    <update id="updateByStockCode" parameterType="com.godwealth.entity.StockCode">
     update stock_code
-    set name = #{name,jdbcType=VARCHAR},
-      stock_code = #{stockCode,jdbcType=VARCHAR},
-      category = #{category,jdbcType=CHAR},
-      sw_effective = #{swEffective,jdbcType=CHAR},
-      memo = #{memo,jdbcType=VARCHAR},
-      exchange_code = #{exchangeCode,jdbcType=VARCHAR},
-      add_user = #{addUser,jdbcType=VARCHAR},
-      add_date = #{addDate,jdbcType=TIMESTAMP},
-      add_user_id = #{addUserId,jdbcType=INTEGER}
-    where id = #{id,jdbcType=INTEGER}
+    set id = #{id,jdbcType=INTEGER},
+        downward_deviation = #{downwardDeviation,jdbcType=INTEGER},
+        deviation = #{deviation,jdbcType=INTEGER},
+        sw_effective = #{swEffective,jdbcType=CHAR}
+    where stock_code = #{stockCode,jdbcType=VARCHAR}
   </update>
     <delete id="deleteBystockCode" parameterType="java.lang.String">
      delete from stock_code
@@ -186,6 +181,18 @@
             #{item.exchangeCode},#{item.addUser},now())
         </foreach>
     </insert>
+
+    <select id="selectByVars" parameterType="java.lang.String"
+            resultType="com.godwealth.entity.StockCode">
+        select
+        <include refid="Base_Column_List"/>
+        from stock_code
+        where stock_code like CONCAT('%',#{vars,jdbcType=VARCHAR},'%')
+        or sw_effective like CONCAT('%',#{vars,jdbcType=VARCHAR},'%')
+        or name like CONCAT('%',#{vars,jdbcType=VARCHAR},'%')
+        order by sw_effective desc,category desc
+
+    </select>
 
 
 </mapper>

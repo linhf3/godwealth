@@ -9,12 +9,10 @@ import com.godwealth.entity.DeviationStrategy;
 import com.godwealth.entity.StockCode;
 import com.godwealth.entity.StockLog;
 import com.godwealth.service.StockService;
-import com.godwealth.utils.Constant;
-import com.godwealth.utils.RedisUtils;
-import com.godwealth.utils.SendMail;
-import com.godwealth.utils.SortUtils;
+import com.godwealth.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
@@ -51,23 +49,25 @@ public class StockServiceImpl implements StockService {
     private RedisUtils redisUtils;
 
     @Override
-    public List<Map<String, Object>> stockData() throws GeneralSecurityException, MessagingException {
-        StockCode stockCode = new StockCode();
-        stockCode.setSwEffective("有效");
-        stockCode.setCategory("1");
-        List<StockCode> stockCodes = stockCodeMapper.selectByCondition(stockCode);
-        List<Map<String,Object>> result = new ArrayList<>();
-        StringBuilder sb = new StringBuilder("");
-        //查询策略
-        Object deviationStrategyString = redisUtils.get("deviationStrategyString");
-        DeviationStrategy deviationStrategy  = null;
-        if (ObjectUtils.isEmpty(deviationStrategyString)){
-            deviationStrategy = deviationStrategyMapper.selectByPrimaryKey(1);
-            redisUtils.set("allStocksDataList",JSON.toJSONString(deviationStrategy));
+    public Map<String,Object> stockData() throws GeneralSecurityException, MessagingException {
+        Map<String, Object> resultMap = new HashMap<>();
+        //1.查询有效配置
+        Object stocksEffectiveList = redisUtils.get("stocksEffectiveList");
+        List<StockCode> stockCodes = null;
+        if (StringUtils.isBlank((CharSequence) stocksEffectiveList)){
+            StockCode stockCode = new StockCode();
+            stockCode.setSwEffective("有效");
+            stockCode.setCategory("1");
+            stockCodes = stockCodeMapper.selectByCondition(stockCode);
+            if (!CollectionUtils.isEmpty(stockCodes)){
+                redisUtils.set("stocksEffectiveList",JSON.toJSONString(stockCodes));
+            }
         }else {
-            deviationStrategy = JSONObject.parseObject((String) deviationStrategyString, DeviationStrategy.class);
+            stockCodes = JSONObject.parseArray((String) stocksEffectiveList, StockCode.class);
         }
 
+        List<Map<String,Object>> result = new ArrayList<>();
+        StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < stockCodes.size(); i++) {
             HashMap<String, Object> hash = new HashMap<>();
             String code = stockCodes.get(i).getStockCode();
@@ -133,21 +133,27 @@ public class StockServiceImpl implements StockService {
             }
             hash.put("proportion",proportion>0?"+"+Math.round(proportion)+"%":Math.round(proportion)+"%");
 
-            //查询结果，是否存在买有的数据
-            StockLog qStockLog = new StockLog();
-            qStockLog.setCategory("1");
-            qStockLog.setSwEffective("有效");
-            qStockLog.setType("买");
-            qStockLog.setStockCode((String) hash.get("code"));
-
-            List<StockLog> stockLogs = stockLogMapper.selectByCondition(qStockLog);
-
-            StockLog selectStockLog = null;
-            if (!CollectionUtils.isEmpty(stockLogs)){
-                selectStockLog = stockLogs.get(0);
+            Object stocksEffectiveListObject = redisUtils.get(new StringBuilder((String) hash.get("code")).append("_buy_log").toString());
+            List<StockLog> stockLogs = null;
+            if (StringUtils.isBlank((CharSequence) stocksEffectiveListObject)){
+                //查询结果，是否存在买有的数据
+                StockLog qStockLog = new StockLog();
+                qStockLog.setCategory("1");
+                qStockLog.setSwEffective("有效");
+                qStockLog.setType("买");
+                qStockLog.setStockCode((String) hash.get("code"));
+                stockLogs = stockLogMapper.selectByCondition(qStockLog);
+                if (!CollectionUtils.isEmpty(stockLogs)){
+                    redisUtils.set(new StringBuilder((String) hash.get("code")).append("_buy_log").toString(),JSON.toJSONString(stockLogs));
+                }
+            }else {
+                stockLogs = JSONObject.parseArray((String) stocksEffectiveListObject, StockLog.class);
             }
+
+            Integer downwardDeviation = stockCodes.get(i).getDownwardDeviation();
+            Integer deviation = stockCodes.get(i).getDeviation();
             //买
-            if(Math.round(proportion) <= deviationStrategy.getNegativeDeviation() && null == selectStockLog){
+            if(null != downwardDeviation && Math.round(proportion) <= downwardDeviation && CollectionUtils.isEmpty(stockLogs)){
                 //如果偏离小于-55，是买入点，则查询是否已经买了，如果没有买，则买入，插入一条数据 stock_log ，也就是增加买入记录
                 StockLog stockLog = new StockLog();
                 stockLog.setStockCode((String) hash.get("code"));
@@ -166,9 +172,10 @@ public class StockServiceImpl implements StockService {
             }
 
             //卖
-            if(Math.round(proportion) >= deviationStrategy.getPositiveDeviation() && null != selectStockLog){
+            if(null != deviation && Math.round(proportion) >= deviation && !CollectionUtils.isEmpty(stockLogs)){
                 //如果偏离小于-65，是买入点，则查询是否已经买了，如果没有买，则买入，插入一条数据 stock_log ，也就是增加买入记录
                 //1.先修改为无效,设置差价，此时卖了
+                StockLog selectStockLog = stockLogs.get(0);
                 selectStockLog.setSwEffective("无效");
                 double prePrice = Double.parseDouble(selectStockLog.getPrice());
                 double afPrice = (double) hash.get("price");
@@ -195,8 +202,9 @@ public class StockServiceImpl implements StockService {
         if(!"".equals(sb.toString())){
             SendMail.sendQqMail(sb.toString());
         }
-        System.out.println("result.toString() = " + result.toString());
-        return result;
+        resultMap.put("resultList",result);
+        log.debug("股票:{}",resultMap);
+        return resultMap;
     }
 
     @Override
@@ -234,28 +242,32 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public int insertSelective(StockCode stockCode) {
-        return stockCodeMapper.insertSelective(stockCode);
+    public Map<String,Object> insertSelective(StockCode stockCode) {
+        Map<String, Object> resultMap = new HashMap<>();
+        redisUtils.flushDb();
+        int resultNumber = stockCodeMapper.insertSelective(stockCode);
+        resultMap.put("resultNumber",resultNumber);
+        return resultMap;
     }
 
     @Override
-    public List<StockCode> querySockCodeList() {
-        StockCode stockCode = new StockCode();
-        return stockCodeMapper.selectByCondition(stockCode);
-    }
-
-    @Override
-    public int updateById(StockCode stockCode) {
-        StringBuilder sbUrl = new StringBuilder(Constant.fiveDaysUrl);
-        if(stockCode.getStockCode().startsWith("6")){
-            sbUrl.append("1."+stockCode.getStockCode());
-        }else{
-            sbUrl.append("0."+stockCode.getStockCode());
+    public Map<String,Object> querySockCodeList(String vars) {
+        Map<String, Object> resultMap = new HashMap<>();
+        if (StringUtils.isNotBlank(vars)&&!"LLLL".equals(vars)){
+            resultMap.put("resultList",stockCodeMapper.selectByVars(vars));
+            return resultMap;
         }
-        String rx = restTemplate.getForObject(sbUrl.toString(),String.class);
-        Map node = (Map) JSON.parse(rx);
-        Map data = (Map) node.get("data");
-        stockCode.setName((String) data.get("name"));
-        return stockCodeMapper.updateByPrimaryKey(stockCode);
+        StockCode stockCode = new StockCode();
+        resultMap.put("resultList",stockCodeMapper.selectByCondition(stockCode));
+        return resultMap;
+    }
+
+    @Override
+    public Map<String,Object> updateByStockCode(StockCode stockCode) {
+        Map<String, Object> resultMap = new HashMap<>();
+        redisUtils.flushDb();
+        int resultNumber = stockCodeMapper.updateByStockCode(stockCode);
+        resultMap.put("resultNumber",resultNumber);
+        return resultMap;
     }
 }

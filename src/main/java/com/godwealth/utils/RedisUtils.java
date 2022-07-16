@@ -330,6 +330,17 @@ public class RedisUtils {
         return redisTemplate.opsForHash().delete(key, hashKeys);
     }
 
+
+    /**
+     * 清空缓存
+     *
+     * @return 删除成功的 数量
+     */
+    public Long flushDb() {
+        Set keys = redisTemplate.keys("*");
+        return redisTemplate.delete(keys);
+    }
+
     /**
      * 给指定 hash 的 hashkey 做增减操作
      *

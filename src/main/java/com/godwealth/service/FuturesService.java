@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 public interface FuturesService {
 
-    List<Map<String,Object>> futuresData() throws IOException;
+    Map<String,Object> futuresData() throws IOException;
 
     /**
      * 获取期货数据，处理好存入数据库（最多4日数据）

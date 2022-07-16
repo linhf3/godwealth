@@ -51,8 +51,8 @@ public class StockControllerTest {
     public void test1() throws Exception{
         StockCode stockCode = stockCodeMapper.selectByPrimaryKey(1013);
         log.debug("对象信息：{}",stockCode);
-        List<Map<String, Object>> maps = futuresService.futuresData();
-        log.debug("对象信息：{}",maps);
+        //List<Map<String, Object>> maps = futuresService.futuresData();
+        //log.debug("对象信息：{}",maps);
     }
     @Autowired
     private DefaultListableBeanFactory defaultListableBeanFactory;
