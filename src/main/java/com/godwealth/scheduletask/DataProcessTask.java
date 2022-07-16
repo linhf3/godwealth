@@ -31,12 +31,12 @@ public class DataProcessTask {
     }
 
     //周一至周五的上午15:10触发
-    @Scheduled(cron = "0 10 15 ? * MON-FRI")
-    public void execute(){
-        if (HolidaysUtils.whetherToWork()){
-            futuresService.updateFuturesData();
-        }
-    }
+//    @Scheduled(cron = "0 10 15 ? * MON-FRI")
+//    public void execute(){
+//        if (HolidaysUtils.whetherToWork()){
+//            futuresService.updateFuturesData();
+//        }
+//    }
 
 
 }

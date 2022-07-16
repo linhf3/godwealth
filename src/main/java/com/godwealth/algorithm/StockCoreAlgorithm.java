@@ -47,6 +47,7 @@ public class StockCoreAlgorithm implements CoreAlgorithm{
         Map node = (Map) JSON.parse(rx);
         //数据集
         Map data = (Map) node.get("data");
+
         List list = (List) data.get("trends");
         HashMap<String, Object> map = new HashMap<>();
         double preClose = Double.valueOf(data.get("preClose").toString());
@@ -108,6 +109,7 @@ public class StockCoreAlgorithm implements CoreAlgorithm{
         Integer[] fivenegativeArrays = (Integer[]) fiveNegative.toArray(new Integer[fiveNegative.size()]);
         Integer[] onePlusArrays = (Integer[]) onePlus.toArray(new Integer[onePlus.size()]);
         Integer[] oneNegativeArrays = (Integer[]) oneNegative.toArray(new Integer[oneNegative.size()]);
+
         //当日价格，在原来价格的基础上*100，要获取原来价格可除以100即可
 
         //Integer[] curentPriceArrays = (Integer[]) curentPriceList.toArray(new Integer[curentPriceList.size()]);
@@ -141,8 +143,13 @@ public class StockCoreAlgorithm implements CoreAlgorithm{
             }
             fiveIndex = SortUtils.binarySearch(fivenegativeArrays,0,fivenegativeArrays.length,curentNum);
             fiveProportion = -(fiveIndex/fivenegativeArrays.length)*100;
-            oneIndex = SortUtils.binarySearch(oneNegativeArrays,0,oneNegativeArrays.length,curentNum);
-            oneProportion = -(oneIndex/oneNegativeArrays.length)*100;
+            if (oneNegativeArrays.length == 0){
+                oneProportion = 0;
+            }else {
+                oneIndex = SortUtils.binarySearch(oneNegativeArrays,0,oneNegativeArrays.length,curentNum);
+                oneProportion = -(oneIndex/oneNegativeArrays.length)*100;
+            }
+
         }
         map.put("lowestPrice",curentPriceList.first());
         map.put("highestPrice",curentPriceList.last());

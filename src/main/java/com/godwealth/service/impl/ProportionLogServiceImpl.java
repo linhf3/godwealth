@@ -56,12 +56,12 @@ public class ProportionLogServiceImpl implements ProportionLogService {
                 proportionLog.setCode(code);
                 proportionLog.setName(name);
                 proportionLog.setPrice(price);
+                log.debug("code:{}",code);
                 Map<String, Object> vmap = coreAlgorithmContet.deviationRateCore("stockCoreAlgorithm",code);
-                String fiveProportion = (String) vmap.get("fiveProportion");
+                String fiveProportion = String.valueOf(vmap.get("fiveProportion"));
                 proportionLog.setProportion(fiveProportion);
                 log.info("collectStockDeviationLogs方法：name:"+name+",code:"+code+",proportion:"+fiveProportion+",price:"+price);
                 proportionLogList.add(proportionLog);
-                //proportionLogMapper.insertSelective(proportionLog);
             }
             proportionLogMapper.insertList(proportionLogList);
         }

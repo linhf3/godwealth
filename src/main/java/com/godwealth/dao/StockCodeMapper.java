@@ -24,4 +24,8 @@ public interface StockCodeMapper {
     List<StockCode> selectByVars(String vars);
 
     int insertList(List<StockCode> record);
+
+    StockCode selectByName(String name);
+
+    int updateByName(StockCode record);
 }

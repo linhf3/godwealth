@@ -89,13 +89,18 @@ public class FuturesServiceImpl implements FuturesService {
                 Map node = (Map) JSON.parse(rx);
                 //数据集
                 Map map = (Map) node.get("data");
+                List trendsM = (List) map.get("trends");
+                //白天开盘，无数据的情况（晚上）
+                if (CollectionUtils.isEmpty(trendsM)){
+                    continue;
+                }
                 Map<String, Object> reMap = coreAlgorithmContet.deviationTheDayRate("futuresCoreAlgorithm", map);
                 String proportion = (String) reMap.get("proportion");
                 Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
-                if (null == stockCodeF.getDownwardDeviation()){
+                if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()){
                     stockCodeF.setDownwardDeviation(-100);
                 }
-                if (null == stockCodeF.getDeviation()){
+                if (null == stockCodeF.getDeviation() || 0 == stockCodeF.getDeviation()){
                     stockCodeF.setDeviation(100);
                 }
                 if (proportionDouble<=stockCodeF.getDownwardDeviation()){

@@ -69,8 +69,9 @@ public class StockServiceImpl implements StockService {
         List<Map<String,Object>> result = new ArrayList<>();
         StringBuilder sb = new StringBuilder("");
         for (int i = 0; i < stockCodes.size(); i++) {
+            StockCode stockCode = stockCodes.get(i);
             HashMap<String, Object> hash = new HashMap<>();
-            String code = stockCodes.get(i).getStockCode();
+            String code = stockCode.getStockCode();
             StringBuilder sbUrl = new StringBuilder(Constant.fiveDaysUrl);
             if(code.startsWith("6")){
                 sbUrl.append("1."+code);
@@ -132,6 +133,20 @@ public class StockServiceImpl implements StockService {
                 proportion = -(index/negatives.length)*100;
             }
             hash.put("proportion",proportion>0?"+"+Math.round(proportion)+"%":Math.round(proportion)+"%");
+
+            if (null == stockCode.getDownwardDeviation()|| 0 == stockCode.getDownwardDeviation()){
+                stockCode.setDownwardDeviation(-100);
+            }
+            if (null == stockCode.getDeviation() || 0 == stockCode.getDeviation()){
+                stockCode.setDeviation(100);
+            }
+            if (proportion<=stockCode.getDownwardDeviation()){
+                hash.put("positiveNegativeFlag",-1);
+            }else if (proportion>=stockCode.getDeviation()){
+                hash.put("positiveNegativeFlag",1);
+            }else {
+                hash.put("positiveNegativeFlag",0);
+            }
 
             Object stocksEffectiveListObject = redisUtils.get(new StringBuilder((String) hash.get("code")).append("_buy_log").toString());
             List<StockLog> stockLogs = null;

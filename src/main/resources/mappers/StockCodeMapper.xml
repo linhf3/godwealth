@@ -194,5 +194,44 @@
 
     </select>
 
+    <select id="selectByName" parameterType="java.lang.String"
+            resultType="com.godwealth.entity.StockCode">
+        select
+        <include refid="Base_Column_List"/>
+        from stock_code where name = #{name,jdbcType=VARCHAR}
+    </select>
+    <update id="updateByName" parameterType="com.godwealth.entity.StockCode">
+        update stock_code
+            <set>
+                <if test="name != null">
+                    name = #{name,jdbcType=VARCHAR},
+                </if>
+                <if test="stockCode != null">
+                    stock_code = #{stockCode,jdbcType=VARCHAR},
+                </if>
+                <if test="category != null">
+                    category = #{category,jdbcType=CHAR},
+                </if>
+                <if test="swEffective != null">
+                    sw_effective = #{swEffective,jdbcType=CHAR},
+                </if>
+                <if test="memo != null">
+                    memo = #{memo,jdbcType=VARCHAR},
+                </if>
+                <if test="exchangeCode != null">
+                    exchange_code = #{exchangeCode,jdbcType=VARCHAR},
+                </if>
+                <if test="addUser != null">
+                    add_user = #{addUser,jdbcType=VARCHAR},
+                </if>
+                <if test="addDate != null">
+                    add_date = #{addDate,jdbcType=TIMESTAMP},
+                </if>
+                <if test="addUserId != null">
+                    add_user_id = #{addUserId,jdbcType=INTEGER},
+                </if>
+            </set>
+            where name = #{name,jdbcType=VARCHAR}
+  </update>
 
 </mapper>
