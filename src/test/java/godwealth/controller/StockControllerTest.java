@@ -21,7 +21,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,6 +54,9 @@ public class StockControllerTest {
     @Autowired
     private RedisUtils redisUtils;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     @Autowired
     private ProportionLogService proportionLogService;
@@ -68,13 +73,21 @@ public class StockControllerTest {
 
     @Test
     public void test3() throws Exception{
-        futuresService.updateFuturesData();
+        futuresService.updateFuturesSourceData();
     }
     @org.junit.Test
     public void test2(){
-        redisUtils.set("sss_buy_log","3333");
-        Long buy_log = redisUtils.deleteEndWith("_buy_log");
-        log.debug("sss:{}",buy_log);
+        Map<String, String> a = new HashMap<>();
+        a.put("11","11");
+        a.put("12","12");
+        a.put("13","13");
+        //redisUtils.add("sss_buy_log",a);
+        //redisUtils.expire("sss_buy_log",1);
+        //redisUtils.batchSet(a);
+        //Object o = redisTemplate.opsForValue().get("11");
+        redisTemplate.opsForValue().append("11", "22222222222");
+        Object o1 = redisTemplate.opsForValue().size("11");
+        log.debug("测试：{}",o1);
     }
 
 

@@ -245,78 +245,78 @@ public class FuturesServiceImpl implements FuturesService {
             //数据集
             list.forEach(map -> {
                 String name = (String) map.get("name");
-                if (name.contains("主力") && !name.contains("次")) {
-                    //发请求查当日明细数据，拼接地址
-                    Map urlMaps = new HashMap<>();
-                    String dm = (String) map.get("dm");
-                    String exchangeCode = new StringBuilder(s).append(".").append(dm).toString();
-                    urlMaps.put("futuresUrl", exchangeCode);
-                    //发送http请求
-                    String rxs = null;
-                    try {
-                        rxs = HttpUtils.doGet(new StrSubstitutor(urlMaps).replace(Constant.futuresUrl), null);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Map nodes = (Map) JSON.parse(rxs);
-                    //获取爬取的数据集
-                    Map dataMap = (Map) nodes.get("data");
-                    List trendsList = (List) dataMap.get("trends");
-                    if (CollectionUtils.isEmpty(finalFuturesDataList)) {//需要批量插入
-                        List<List> futuresDatasLinkedList = new LinkedList<>();
-                        FuturesData futuresData = new FuturesData();
-                        futuresData.setName(name);
-                        futuresData.setExchangeCode(exchangeCode);
-                        futuresDatasLinkedList.add(trendsList);
-                        String str = JSON.toJSON(futuresDatasLinkedList).toString();
-                        futuresData.setData(str);
-                        futuresDataLinkedList.add(futuresData);
-                        log.debug(futuresData.toString());
-                    } else {  //更新/插入
-                        for (FuturesData f : finalFuturesDataList) {
-                            if (exchangeCode.equals(f.getExchangeCode())) {
-                                FuturesData futuresData = new FuturesData();
-                                BeanUtils.copyProperties(f, futuresData);
-                                String data = futuresData.getData();
-                                List<List> dataList = JSON.parseArray(data, List.class);
-                                String formatDate = Constant.slf.format(new Date());
-                                List listStr = dataList.get(dataList.size() - 1);
-                                if (CollectionUtils.isEmpty(listStr) && StringUtils.isNotBlank(f.getData())) {
-                                    dataList.remove(dataList.size() - 1);
-                                    dataList.add(trendsList);
-                                    String dataListString = JSON.toJSON(dataList).toString();
-                                    futuresData.setData(dataListString);
-                                    //更新数据
-                                    futuresDataMapper.updateByPrimaryKeySelective(futuresData);
-                                    continue;
-                                }
-                                String str = (String) listStr.get(listStr.size() - 1);
-                                String[] split = str.split(",");
-                                if (!formatDate.equals(split[0].substring(0, 10)) && dataList.size() == 4) {
-                                    dataList.remove(0);
-                                    dataList.add(trendsList);
-                                    String dataListString = JSON.toJSON(dataList).toString();
-                                    futuresData.setData(dataListString);
-                                    //更新数据
-                                    futuresDataMapper.updateByPrimaryKeySelective(futuresData);
-                                } else if (!formatDate.equals(split[0].substring(0, 10)) && dataList.size() < 4) {
-                                    dataList.add(trendsList);
-                                    String dataListString = JSON.toJSON(dataList).toString();
-                                    futuresData.setData(dataListString);
-                                    //更新数据
-                                    futuresDataMapper.updateByPrimaryKeySelective(futuresData);
-                                } else if (formatDate.equals(split[0].substring(0, 10))) {
-                                    dataList.remove(dataList.size() - 1);
-                                    dataList.add(trendsList);
-                                    String dataListString = JSON.toJSON(dataList).toString();
-                                    futuresData.setData(dataListString);
-                                    //更新数据
-                                    futuresDataMapper.updateByPrimaryKeySelective(futuresData);
-                                }
+                //if (name.contains("主力") && !name.contains("次")) {
+                //发请求查当日明细数据，拼接地址
+                Map urlMaps = new HashMap<>();
+                String dm = (String) map.get("dm");
+                String exchangeCode = new StringBuilder(s).append(".").append(dm).toString();
+                urlMaps.put("futuresUrl", exchangeCode);
+                //发送http请求
+                String rxs = null;
+                try {
+                    rxs = HttpUtils.doGet(new StrSubstitutor(urlMaps).replace(Constant.futuresUrl), null);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Map nodes = (Map) JSON.parse(rxs);
+                //获取爬取的数据集
+                Map dataMap = (Map) nodes.get("data");
+                List trendsList = (List) dataMap.get("trends");
+                if (CollectionUtils.isEmpty(finalFuturesDataList)) {//需要批量插入
+                    List<List> futuresDatasLinkedList = new LinkedList<>();
+                    FuturesData futuresData = new FuturesData();
+                    futuresData.setName(name);
+                    futuresData.setExchangeCode(exchangeCode);
+                    futuresDatasLinkedList.add(trendsList);
+                    String str = JSON.toJSON(futuresDatasLinkedList).toString();
+                    futuresData.setData(str);
+                    futuresDataLinkedList.add(futuresData);
+                    log.debug(futuresData.toString());
+                } else {  //更新/插入
+                    for (FuturesData f : finalFuturesDataList) {
+                        if (exchangeCode.equals(f.getExchangeCode())) {
+                            FuturesData futuresData = new FuturesData();
+                            BeanUtils.copyProperties(f, futuresData);
+                            String data = futuresData.getData();
+                            List<List> dataList = JSON.parseArray(data, List.class);
+                            String formatDate = Constant.slf.format(new Date());
+                            List listStr = dataList.get(dataList.size() - 1);
+                            if (CollectionUtils.isEmpty(listStr) && StringUtils.isNotBlank(f.getData())) {
+                                dataList.remove(dataList.size() - 1);
+                                dataList.add(trendsList);
+                                String dataListString = JSON.toJSON(dataList).toString();
+                                futuresData.setData(dataListString);
+                                //更新数据
+                                futuresDataMapper.updateByPrimaryKeySelective(futuresData);
+                                continue;
+                            }
+                            String str = (String) listStr.get(listStr.size() - 1);
+                            String[] split = str.split(",");
+                            if (!formatDate.equals(split[0].substring(0, 10)) && dataList.size() == 4) {
+                                dataList.remove(0);
+                                dataList.add(trendsList);
+                                String dataListString = JSON.toJSON(dataList).toString();
+                                futuresData.setData(dataListString);
+                                //更新数据
+                                futuresDataMapper.updateByPrimaryKeySelective(futuresData);
+                            } else if (!formatDate.equals(split[0].substring(0, 10)) && dataList.size() < 4) {
+                                dataList.add(trendsList);
+                                String dataListString = JSON.toJSON(dataList).toString();
+                                futuresData.setData(dataListString);
+                                //更新数据
+                                futuresDataMapper.updateByPrimaryKeySelective(futuresData);
+                            } else if (formatDate.equals(split[0].substring(0, 10))) {
+                                dataList.remove(dataList.size() - 1);
+                                dataList.add(trendsList);
+                                String dataListString = JSON.toJSON(dataList).toString();
+                                futuresData.setData(dataListString);
+                                //更新数据
+                                futuresDataMapper.updateByPrimaryKeySelective(futuresData);
                             }
                         }
                     }
                 }
+                //  }
             });
         });
         if (!CollectionUtils.isEmpty(futuresDataLinkedList)) {
@@ -348,18 +348,21 @@ public class FuturesServiceImpl implements FuturesService {
             System.out.println(list.toArray());
             list.forEach(map -> {
                 String name = (String) map.get("name");
-                if (name.contains("主力") && !name.contains("次")) {
-                    StockCode stockCode = new StockCode();
-                    stockCode.setName(name);
-                    String dm = (String) map.get("dm");
-                    stockCode.setStockCode(dm);
-                    stockCode.setCategory("2");
-                    stockCode.setSwEffective("无效");
-                    stockCode.setMemo(name);
-                    stockCode.setExchangeCode(new StringBuilder(s).append(".").append(dm).toString());
-                    stockCode.setAddUser("admin");
-                    stockCodeLinkedList.add(stockCode);
-                }
+                //if (name.contains("主力") && !name.contains("次")) {
+                StockCode stockCode = new StockCode();
+                stockCode.setName(name);
+                String dm = (String) map.get("dm");
+                stockCode.setStockCode(dm);
+                stockCode.setCategory("2");
+                stockCode.setSwEffective("无效");
+                stockCode.setMemo(name);
+                stockCode.setDownwardDeviation(-90);
+                stockCode.setDeviation(90);
+                stockCode.setExchangeCode(new StringBuilder(s).append(".").append(dm).toString());
+                stockCode.setAddUser("admin");
+                stockCode.setAddDate(new Date());
+                stockCodeLinkedList.add(stockCode);
+                // }
             });
         });
         log.debug("list:{}", stockCodeLinkedList);
@@ -367,10 +370,11 @@ public class FuturesServiceImpl implements FuturesService {
             StockCode stockCode = stockCodeLinkedList.get(i);
             StockCode quStockCode = stockCodeMapper.selectByName(stockCode.getName());
             if (null == quStockCode) {
-                stockCodeMapper.insert(quStockCode);
-            } else {
-                stockCodeMapper.updateByName(quStockCode);
+                stockCodeMapper.insert(stockCode);
             }
+//            else {
+//                stockCodeMapper.updateByName(stockCode);
+//            }
         }
     }
 }

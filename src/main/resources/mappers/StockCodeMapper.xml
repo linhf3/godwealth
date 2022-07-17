@@ -33,11 +33,11 @@
     insert into stock_code (id, name, stock_code, 
       category, sw_effective, memo, 
       exchange_code, add_user, add_date, 
-      add_user_id)
+      add_user_id,downward_deviation,deviation)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{stockCode,jdbcType=VARCHAR}, 
       #{category,jdbcType=CHAR}, #{swEffective,jdbcType=CHAR}, #{memo,jdbcType=VARCHAR}, 
       #{exchangeCode,jdbcType=VARCHAR}, #{addUser,jdbcType=VARCHAR}, #{addDate,jdbcType=TIMESTAMP}, 
-      #{addUserId,jdbcType=INTEGER})
+      #{addUserId,jdbcType=INTEGER},#{downwardDeviation,jdbcType=INTEGER},#{deviation,jdbcType=INTEGER})
   </insert>
     <insert id="insertSelective" parameterType="com.godwealth.entity.StockCode">
         insert into stock_code
