@@ -367,16 +367,19 @@ public class FuturesServiceImpl implements FuturesService {
                 // }
             });
         });
-        log.debug("list:{}", stockCodeLinkedList);
+        List<StockCode> stockCodes = new LinkedList<>();
         for (int i = 0; i < stockCodeLinkedList.size(); i++) {
             StockCode stockCode = stockCodeLinkedList.get(i);
             StockCode quStockCode = stockCodeMapper.selectByName(stockCode.getName());
             if (null == quStockCode) {
-                stockCodeMapper.insert(stockCode);
+                stockCodes.add(stockCode);
             }
-//            else {
-//                stockCodeMapper.updateByName(stockCode);
-//            }
         }
+        log.debug("list:{}", stockCodes);
+        if (!CollectionUtils.isEmpty(stockCodes)) {
+            stockCodeMapper.insertList(stockCodes);
+        }
+
+
     }
 }
