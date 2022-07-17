@@ -16,6 +16,8 @@ public interface FuturesService {
 
     Map<String,Object> futuresData() throws IOException;
 
+    Map<String,Object> futuresfiveData() throws IOException;
+
     /**
      * 获取期货数据，处理好存入数据库（最多4日数据）
      */

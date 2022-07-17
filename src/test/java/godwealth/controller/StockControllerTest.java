@@ -68,7 +68,7 @@ public class StockControllerTest {
 
     @Test
     public void test3() throws Exception{
-        proportionLogService.collectStockDeviationLogs();
+        futuresService.updateFuturesData();
     }
     @org.junit.Test
     public void test2(){
