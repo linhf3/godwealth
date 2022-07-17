@@ -225,6 +225,7 @@ public class FuturesServiceImpl implements FuturesService {
 
         //2.爬数据
         List<String> linkedList = new LinkedList<>();
+        linkedList.add("112");
         linkedList.add("113");
         linkedList.add("114");
         linkedList.add("115");
@@ -328,6 +329,7 @@ public class FuturesServiceImpl implements FuturesService {
     @Override
     public void updateFuturesSourceData() {
         LinkedList<String> linkedList = new LinkedList<>();
+        linkedList.add("112");
         linkedList.add("113");
         linkedList.add("114");
         linkedList.add("115");
