@@ -85,6 +85,7 @@ public class FuturesServiceImpl implements FuturesService {
                     continue;
                 }
                 Map<String, Object> reMap = coreAlgorithmContet.deviationTheDayRate("futuresCoreAlgorithm", map);
+                reMap.put("name",stockCodeF.getName());
                 String proportion = (String) reMap.get("proportion");
                 Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
                 if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
@@ -160,6 +161,7 @@ public class FuturesServiceImpl implements FuturesService {
                     continue;
                 }
                 Map<String, Object> reMap = coreAlgorithmContet.deviationTheDayRate("futuresCoreAlgorithm", map);
+                reMap.put("name",stockCodeF.getName());
                 String proportion = (String) reMap.get("proportion");
                 Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
                 if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
@@ -225,6 +227,7 @@ public class FuturesServiceImpl implements FuturesService {
 
         //2.爬数据
         List<String> linkedList = new LinkedList<>();
+        linkedList.add("103");
         linkedList.add("112");
         linkedList.add("113");
         linkedList.add("114");
@@ -246,6 +249,9 @@ public class FuturesServiceImpl implements FuturesService {
             //数据集
             list.forEach(map -> {
                 String name = (String) map.get("name");
+                if("103".equals(s)){
+                    name = new StringBuilder(name).append("(美)").toString();
+                }
                 //if (name.contains("主力") && !name.contains("次")) {
                 //发请求查当日明细数据，拼接地址
                 Map urlMaps = new HashMap<>();
@@ -329,6 +335,7 @@ public class FuturesServiceImpl implements FuturesService {
     @Override
     public void updateFuturesSourceData() {
         LinkedList<String> linkedList = new LinkedList<>();
+        linkedList.add("103");
         linkedList.add("112");
         linkedList.add("113");
         linkedList.add("114");
@@ -352,6 +359,9 @@ public class FuturesServiceImpl implements FuturesService {
                 String name = (String) map.get("name");
                 //if (name.contains("主力") && !name.contains("次")) {
                 StockCode stockCode = new StockCode();
+                if("103".equals(s)){
+                    name = new StringBuilder(name).append("(美)").toString();
+                }
                 stockCode.setName(name);
                 String dm = (String) map.get("dm");
                 stockCode.setStockCode(dm);

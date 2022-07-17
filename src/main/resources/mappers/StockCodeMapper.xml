@@ -174,11 +174,11 @@
 
     <insert id="insertList" parameterType="java.util.List">
         insert into
-        stock_code (name,stock_code,category,sw_effective,memo,exchange_code,add_user,add_date)
+        stock_code (name,stock_code,category,sw_effective,memo,exchange_code,add_user,add_date,downward_deviation,deviation)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.name},#{item.stockCode},#{item.category},#{item.swEffective},#{item.memo},
-            #{item.exchangeCode},#{item.addUser},now())
+            #{item.exchangeCode},#{item.addUser},now(),#{item.downwardDeviation,jdbcType=INTEGER},#{item.deviation,jdbcType=INTEGER})
         </foreach>
     </insert>
 
