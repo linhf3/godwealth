@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RScoredSortedSet;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,8 +27,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.lang.model.element.VariableElement;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -53,6 +57,8 @@ public class StockControllerTest {
     private StockService stockService;
     @Autowired
     private RedisUtils redisUtils;
+    @Autowired
+    private RedissonClient redisson;
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -73,21 +79,19 @@ public class StockControllerTest {
 
     @Test
     public void test3() throws Exception{
-        futuresService.updateFuturesSourceData();
+        RScoredSortedSet<String> set = redisson.getScoredSortedSet("simple");
+        set.add(0.13, "111");
+        set.add(0.12, "131");
+        set.add(0.12, "134");
+        set.add(0.15, "121");
+        System.out.println(set.getScore("131"));
+        System.out.println(set.getScore("134"));
+        //futuresService.updateFuturesSourceData();
     }
     @org.junit.Test
     public void test2(){
-        Map<String, String> a = new HashMap<>();
-        a.put("11","11");
-        a.put("12","12");
-        a.put("13","13");
-        //redisUtils.add("sss_buy_log",a);
-        //redisUtils.expire("sss_buy_log",1);
-        //redisUtils.batchSet(a);
-        //Object o = redisTemplate.opsForValue().get("11");
-        redisTemplate.opsForValue().append("11", "22222222222");
-        Object o1 = redisTemplate.opsForValue().size("11");
-        log.debug("测试：{}",o1);
+        redisUtils.flushDb();
+
     }
 
 

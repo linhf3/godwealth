@@ -26,14 +26,17 @@ public class FuturesCoreAlgorithm implements CoreAlgorithm {
         Set negative = new HashSet();
         int curentNum = 0;//当前价格的值*100
         boolean curentType = true;//当前是正还是负偏离，匹配数组
+        List<Double> price = new ArrayList<>();
         //设置价格是否存在上下波动，即存在0的情况，计算存在误差
         for (int j = 0; j < trendsList.size(); j++) {
             String s = (String) trendsList.get(j);
             String[] split = s.split(",");
             //当前
             double s1 = Double.valueOf(split[1]);
+            price.add(Double.valueOf(split[2]));
+            price.add(Double.valueOf(split[3]));
             //平均
-            double s2 = Double.valueOf(split[2]);
+            double s2 = Double.valueOf(split[4]);
             BigDecimal s3 = new BigDecimal((s1 - s2) * 100);
             int f1 = (int) s3.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             if (s1 >= s2) {
@@ -70,6 +73,10 @@ public class FuturesCoreAlgorithm implements CoreAlgorithm {
             index = SortUtils.binarySearch(negatives, 0, negatives.length, curentNum);
             proportion = -(index / negatives.length) * 100;
         }
+        //找出最大最小值
+        double max = Collections.max(price);
+        double min = Collections.min(price);
+        reMap.put("dailySpread",max-min);
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
         return reMap;
     }

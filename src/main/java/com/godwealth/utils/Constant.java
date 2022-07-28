@@ -17,7 +17,7 @@ public class Constant {
     //当日股票数据
     public static final String oneDaysUrl = "http://push2his.eastmoney.com/api/qt/stock/trends2/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58&ndays=1&iscr=0&iscca=0&secid=";
     //期货一天明细数据
-    public static final String futuresUrl ="http://push2.eastmoney.com/api/qt/stock/trends2/get?secid=${futuresUrl}&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf11%2Cf12%2Cf13&fields2=f51%2Cf53%2Cf58";
+    public static final String futuresUrl ="http://push2.eastmoney.com/api/qt/stock/trends2/get?secid=${futuresUrl}&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8%2Cf9%2Cf10%2Cf11%2Cf12%2Cf13&fields2=f51%2Cf53%2Cf54%2Cf55%2Cf58";
     //期货主力数据
     public static final String FUTURESMAINFORCEURL ="https://futsseapi.eastmoney.com/list/${place}?orderBy=zdf&sort=desc&pageSize=5000&pageIndex=0";
     public static SimpleDateFormat slf = new SimpleDateFormat("yyyy-MM-dd");
