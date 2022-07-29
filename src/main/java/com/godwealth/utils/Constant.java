@@ -1,5 +1,6 @@
 package com.godwealth.utils;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 /**
@@ -21,4 +22,5 @@ public class Constant {
     //期货主力数据
     public static final String FUTURESMAINFORCEURL ="https://futsseapi.eastmoney.com/list/${place}?orderBy=zdf&sort=desc&pageSize=5000&pageIndex=0";
     public static SimpleDateFormat slf = new SimpleDateFormat("yyyy-MM-dd");
+    public static DecimalFormat format = new DecimalFormat("#.00");
 }

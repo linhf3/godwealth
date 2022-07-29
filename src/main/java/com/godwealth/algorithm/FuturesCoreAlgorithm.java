@@ -1,5 +1,6 @@
 package com.godwealth.algorithm;
 
+import com.godwealth.utils.Constant;
 import com.godwealth.utils.SortUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -76,7 +77,7 @@ public class FuturesCoreAlgorithm implements CoreAlgorithm {
         //找出最大最小值
         double max = Collections.max(price);
         double min = Collections.min(price);
-        reMap.put("dailySpread",max-min);
+        reMap.put("dailySpread",Double.valueOf(Constant.format.format(max-min)));
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
         return reMap;
     }
