@@ -28,4 +28,5 @@ public interface FuturesService {
      */
     void updateFuturesSourceData();
 
+    void setFiveDayTotal() throws IOException;
 }

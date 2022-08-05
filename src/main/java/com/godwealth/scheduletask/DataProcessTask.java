@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 
 /**
  *
@@ -35,6 +37,14 @@ public class DataProcessTask {
     public void execute(){
         if (HolidaysUtils.whetherToWork()){
             futuresService.updateFuturesData();
+        }
+    }
+
+    //周一至周五的上午15:10触发设置四天差值
+    @Scheduled(cron = "0 20 15 ? * MON-FRI")
+    public void setFiveDayTotal() throws IOException {
+        if (HolidaysUtils.whetherToWork()){
+            futuresService.setFiveDayTotal();
         }
     }
 

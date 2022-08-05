@@ -18,6 +18,8 @@ public class StockCode implements Serializable {
 
     private String exchangeCode;
 
+    private String sinaExchangeCode;
+
     private String addUser;
 
     private Date addDate;
@@ -44,7 +46,17 @@ public class StockCode implements Serializable {
         this.deviation = deviation;
     }
 
+    public String getSinaExchangeCode() {
+        return sinaExchangeCode;
+    }
 
+    public void setSinaExchangeCode(String sinaExchangeCode) {
+        this.sinaExchangeCode = sinaExchangeCode;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
 
     private static final long serialVersionUID = 1L;
 

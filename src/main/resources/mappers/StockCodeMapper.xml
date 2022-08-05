@@ -9,6 +9,7 @@
         <result column="sw_effective" property="swEffective" jdbcType="CHAR"/>
         <result column="memo" property="memo" jdbcType="VARCHAR"/>
         <result column="exchange_code" property="exchangeCode" jdbcType="VARCHAR"/>
+        <result column="sina_exchange_code" property="sinaExchangeCode" jdbcType="VARCHAR"/>
         <result column="add_user" property="addUser" jdbcType="VARCHAR"/>
         <result column="add_date" property="addDate" jdbcType="TIMESTAMP"/>
         <result column="add_user_id" property="addUserId" jdbcType="INTEGER"/>
@@ -16,7 +17,7 @@
         <result column="deviation" property="deviation" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, name, stock_code, category, sw_effective, memo, exchange_code, add_user, add_date, 
+    id, name, stock_code, category, sw_effective, memo, exchange_code,sina_exchange_code, add_user, add_date,
     add_user_id,downward_deviation,deviation
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
@@ -166,6 +167,9 @@
             </if>
             <if test="category != null and '' != category">
                 and category = #{category,jdbcType=CHAR}
+            </if>
+            <if test="sinaExchangeCode != null and '' != sinaExchangeCode">
+                and sina_exchange_code is not null
             </if>
         </where>
         order by sw_effective desc,category desc

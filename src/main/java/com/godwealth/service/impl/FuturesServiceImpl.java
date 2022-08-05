@@ -101,6 +101,12 @@ public class FuturesServiceImpl implements FuturesService {
                 } else {
                     reMap.put("positiveNegativeFlag", 0);
                 }
+                //前五日平均（不计算今天）
+                String sina = (String) redisUtils.get(stockCodeF.getSinaExchangeCode());
+                if (StringUtils.isNotBlank(sina)){
+                    double fiveDailySpread = Double.valueOf(sina);
+                    reMap.put("fiveDailySpread",fiveDailySpread);
+                }
                 list.add(reMap);
             }
         }
@@ -390,6 +396,38 @@ public class FuturesServiceImpl implements FuturesService {
             stockCodeMapper.insertList(stockCodes);
         }
 
+    }
 
+    @Override
+    public void setFiveDayTotal() throws IOException {
+        StockCode stockCode = new StockCode();
+        stockCode.setCategory("2");
+        stockCode.setSwEffective("有效");
+        stockCode.setSinaExchangeCode("sina");
+        List<StockCode> stockCodes = stockCodeMapper.selectByCondition(stockCode);
+        if (!CollectionUtils.isEmpty(stockCodes)){
+            for (int i = 0; i < stockCodes.size(); i++) {
+                StockCode stockCodeSina = stockCodes.get(i);
+                Map urlMap = new HashMap<>();
+                urlMap.put("variety", stockCodeSina.getSinaExchangeCode());
+                //发送http请求
+                String rx = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.SINADATEURL), null);
+                List list = (List) JSON.parse(rx);
+                List sublist = list.subList(list.size() - 5, list.size());
+                System.out.println(sublist);
+                double allH = 0.00d;
+                double allL = 0.00d;
+                for (int i1 = 0; i1 < sublist.size(); i1++) {
+                    List qList = (List) sublist.get(i1);
+                    Object[] objects = qList.toArray();
+                    String h = (String) objects[2];
+                    String l = (String) objects[3];
+                    allH +=Double.valueOf(h);
+                    allL +=Double.valueOf(l);
+                }
+                System.out.println(stockCodeSina.getSinaExchangeCode()+"---"+String.valueOf((allH-allL)/5));
+                redisUtils.set(stockCodeSina.getSinaExchangeCode(),String.valueOf((allH-allL)/5));
+            }
+        }
     }
 }
