@@ -41,11 +41,11 @@ public class DataProcessTask {
     }
 
     //周一至周五的上午15:10触发设置四天差值
-    @Scheduled(cron = "0 20 15 ? * MON-FRI")
+    @Scheduled(cron = "0 */5 9-23 ? * *")
     public void setFiveDayTotal() throws IOException {
-        if (HolidaysUtils.whetherToWork()){
+        //if (HolidaysUtils.whetherToWork()){
             futuresService.setFiveDayTotal();
-        }
+       // }
     }
 
 

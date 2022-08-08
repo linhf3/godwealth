@@ -427,6 +427,7 @@ public class FuturesServiceImpl implements FuturesService {
                 }
                 System.out.println(stockCodeSina.getSinaExchangeCode()+"---"+String.valueOf((allH-allL)/5));
                 redisUtils.set(stockCodeSina.getSinaExchangeCode(),String.valueOf((allH-allL)/5));
+                redisUtils.persist(stockCodeSina.getSinaExchangeCode());
             }
         }
     }

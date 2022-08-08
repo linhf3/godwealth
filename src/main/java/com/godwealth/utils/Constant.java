@@ -32,6 +32,9 @@ public class Constant {
     //新浪日k
     public static final String SINADATEURL ="http://stock2.finance.sina.com.cn/futures/api/json.php/IndexService.getInnerFuturesDailyKLine?symbol=${variety}";
 
+    //外汇
+    public static final String FOREIGN_EXCHANGE_URL ="http://push2.eastmoney.com/api/qt/stock/trends2/get?secid=${place}&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf11%2Cf12%2Cf13%2Cf14&fields2=f51%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58&ndays=1";
+
     public static SimpleDateFormat slf = new SimpleDateFormat("yyyy-MM-dd");
 
     public static DecimalFormat format = new DecimalFormat("#.00");
