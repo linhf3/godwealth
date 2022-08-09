@@ -408,6 +408,10 @@ public class FuturesServiceImpl implements FuturesService {
         if (!CollectionUtils.isEmpty(stockCodes)){
             for (int i = 0; i < stockCodes.size(); i++) {
                 StockCode stockCodeSina = stockCodes.get(i);
+                String sinaExchangeCode = (String) redisUtils.get(stockCodeSina.getSinaExchangeCode());
+                if (StringUtils.isNotBlank(sinaExchangeCode)){
+                    break;
+                }
                 Map urlMap = new HashMap<>();
                 urlMap.put("variety", stockCodeSina.getSinaExchangeCode());
                 //发送http请求
