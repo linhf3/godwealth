@@ -90,9 +90,10 @@ public class StockControllerTest {
     }
     @org.junit.Test
     public void test2() throws IOException {
-        futuresService.setFiveDayTotal();
-        Object fu0 = redisUtils.get("FG0");
-        System.out.println(fu0);
+        futuresService.updateFuturesData();
+//        futuresService.setFiveDayTotal();
+//        Object fu0 = redisUtils.get("FG0");
+//        System.out.println(fu0);
         //redisUtils.flushDb();
 
     }

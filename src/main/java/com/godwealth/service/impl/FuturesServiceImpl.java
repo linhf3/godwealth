@@ -107,6 +107,35 @@ public class FuturesServiceImpl implements FuturesService {
                     double fiveDailySpread = Double.valueOf(sina);
                     reMap.put("fiveDailySpread",fiveDailySpread);
                 }
+                //计算五日差值
+//                Object allFuturesDataList = redisUtils.get("allFuturesDataList");
+//                List<FuturesData> futuresDataList = null;
+//                if (StringUtils.isNotBlank((CharSequence) allFuturesDataList)) {
+//                    futuresDataList = JSONObject.parseArray((String) allFuturesDataList, FuturesData.class);
+//                    try {
+//                        if (!CollectionUtils.isEmpty(futuresDataList)) {
+//                            String exchangeCode = stockCodeF.getExchangeCode();
+//                            for (int j = 0; j < futuresDataList.size(); j++) {
+//                                FuturesData futuresData = futuresDataList.get(j);
+//                                if (exchangeCode.equals(futuresData.getExchangeCode())) {
+//                                    List trendsList = (List) map.get("trends");
+//                                    List<List> dataList = JSON.parseArray(futuresData.getData(), List.class);
+//                                    if (!CollectionUtils.isEmpty(dataList) && !CollectionUtils.isEmpty(dataList.get(0))) {
+//                                        dataList.add(trendsList);
+//                                        String v = coreAlgorithmContet.deviationRateCore("futuresCoreAlgorithm", dataList);
+//                                        reMap.put("fProportion", v);
+//                                    }
+//                                    break;
+//                                }
+//                            }
+//                        } else {
+//                            reMap.put("fProportion", "");
+//                        }
+//                    } catch (Exception e) {
+//                        log.debug("错误信息：{}", e);
+//                    }
+//                }
+
                 list.add(reMap);
             }
         }
