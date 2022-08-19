@@ -33,7 +33,7 @@ public class DataProcessTask {
     }
 
     //周一至周五每隔两小时执行一次
-    @Scheduled(cron = "0 0 0/2 ? * MON-FRI")
+    @Scheduled(cron = "0 0 0/2 * * MON-FRI")
     public void execute(){
         if (HolidaysUtils.whetherToWork()){
             futuresService.updateFuturesData();

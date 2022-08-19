@@ -327,9 +327,11 @@ public class FuturesServiceImpl implements FuturesService {
                                 dataList.remove(dataList.size() - 1);
                                 dataList.add(trendsList);
                                 String dataListString = JSON.toJSON(dataList).toString();
-                                futuresData.setData(dataListString);
                                 //更新数据
                                 futuresDataMapper.updateByPrimaryKeySelective(futuresData);
+                                redisUtils.set(f.getExchangeCode(),dataListString);
+                                redisUtils.expire(f.getExchangeCode(),86400000);
+                                futuresData.setData(dataListString);
                                 continue;
                             }
                             String str = (String) listStr.get(listStr.size() - 1);
@@ -341,12 +343,18 @@ public class FuturesServiceImpl implements FuturesService {
                                 futuresData.setData(dataListString);
                                 //更新数据
                                 futuresDataMapper.updateByPrimaryKeySelective(futuresData);
+                                redisUtils.set(f.getExchangeCode(),dataListString);
+                                redisUtils.expire(f.getExchangeCode(),86400000);
+                                futuresData.setData(dataListString);
                             } else if (!formatDate.equals(split[0].substring(0, 10)) && dataList.size() < 4) {
                                 dataList.add(trendsList);
                                 String dataListString = JSON.toJSON(dataList).toString();
                                 futuresData.setData(dataListString);
                                 //更新数据
                                 futuresDataMapper.updateByPrimaryKeySelective(futuresData);
+                                redisUtils.set(f.getExchangeCode(),dataListString);
+                                redisUtils.expire(f.getExchangeCode(),86400000);
+                                futuresData.setData(dataListString);
                             } else if (formatDate.equals(split[0].substring(0, 10))) {
                                 dataList.remove(dataList.size() - 1);
                                 dataList.add(trendsList);
@@ -354,6 +362,9 @@ public class FuturesServiceImpl implements FuturesService {
                                 futuresData.setData(dataListString);
                                 //更新数据
                                 futuresDataMapper.updateByPrimaryKeySelective(futuresData);
+                                redisUtils.set(f.getExchangeCode(),dataListString);
+                                redisUtils.expire(f.getExchangeCode(),86400000);
+                                futuresData.setData(dataListString);
                             }
                         }
                     }
