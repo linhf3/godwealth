@@ -16,6 +16,8 @@ public interface FuturesService {
 
     Map<String,Object> futuresData() throws IOException;
 
+    Map<String,Object> futuresDataComplex() throws IOException;
+
     Map<String,Object> futuresfiveData() throws IOException;
 
     /**

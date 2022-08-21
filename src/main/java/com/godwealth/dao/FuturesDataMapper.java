@@ -1,6 +1,7 @@
 package com.godwealth.dao;
 
 import com.godwealth.entity.FuturesData;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface FuturesDataMapper {
     List<FuturesData> selectAll();
 
     int insertList(List<FuturesData> record);
+
+    FuturesData selectByExchangeCode(@Param("exchangeCode") String exchangeCode);
 }

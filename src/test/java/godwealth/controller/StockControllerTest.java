@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.godwealth.GodWealthApplication;
 import com.godwealth.algorithm.CoreAlgorithm;
 import com.godwealth.algorithm.FuturesCoreAlgorithm;
+import com.godwealth.config.RabbitMQConfig;
 import com.godwealth.dao.StockCodeMapper;
 import com.godwealth.entity.StockCode;
 import com.godwealth.service.FuturesService;
@@ -13,6 +14,7 @@ import com.godwealth.service.StockService;
 import com.godwealth.service.impl.FuturesServiceImpl;
 import com.godwealth.utils.Constant;
 import com.godwealth.utils.HttpUtils;
+import com.godwealth.utils.Mqutils;
 import com.godwealth.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.text.StrSubstitutor;
@@ -88,15 +90,27 @@ public class StockControllerTest {
         System.out.println(set.getScore("134"));
         //futuresService.updateFuturesSourceData();
     }
+    @Autowired
+    private Mqutils mqutils;
+
     @org.junit.Test
     public void test2() throws IOException {
-        Object o = redisUtils.get("113.fum");
-        System.out.println(o);
-        //futuresService.updateFuturesData();
+//        Object o = redisUtils.get("113.fum");
+//        System.out.println(o);
+//        futuresService.updateFuturesData();
 //        futuresService.setFiveDayTotal();
 //        Object fu0 = redisUtils.get("FG0");
 //        System.out.println(fu0);
-        //redisUtils.flushDb();
+       // redisUtils.flushDb();
+        //futuresService.updateFuturesData();
+        futuresService.setFiveDayTotal();
+
+    }
+
+    @org.junit.Test
+    public void test4() throws IOException {
+        int front;
+        System.out.println(22);
 
     }
 

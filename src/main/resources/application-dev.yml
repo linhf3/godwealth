@@ -26,6 +26,16 @@ spring:
         allow: true
     hikari:
       connection-timeout: 10000
+  rabbitmq:
+    host: 175.178.184.40
+    port: 5672
+    password: guest
+    username: guest
+    listener:
+      simple:
+        acknowledge-mode: auto
+        prefetch: 1
+        default-requeue-rejected: false
 server:
   port: 8081
   servlet:

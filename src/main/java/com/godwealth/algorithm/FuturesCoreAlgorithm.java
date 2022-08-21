@@ -1,19 +1,35 @@
 package com.godwealth.algorithm;
 
+import com.alibaba.fastjson.JSON;
+import com.godwealth.config.RabbitMQConfig;
+import com.godwealth.entity.StockCode;
 import com.godwealth.utils.Constant;
+import com.godwealth.utils.Mqutils;
+import com.godwealth.utils.RedisUtils;
 import com.godwealth.utils.SortUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
+
 /**
  * 期货
+ *
  * @author sie_linhongfei
  * @createDate 2022/07/09 10:27
  */
 @Component
+@Slf4j
 public class FuturesCoreAlgorithm implements CoreAlgorithm {
+
+    @Autowired
+    private RedisUtils redisUtils;
+
+    @Autowired
+    private Mqutils mqutils;
 
     @Override
     public Map<String, Object> deviationTheDayRate(Map map) {
@@ -77,8 +93,19 @@ public class FuturesCoreAlgorithm implements CoreAlgorithm {
         //找出最大最小值
         double max = Collections.max(price);
         double min = Collections.min(price);
-        reMap.put("dailySpread",Double.valueOf(Constant.format.format(max-min)));
+        reMap.put("dailySpread", Double.valueOf(Constant.format.format(max - min)));
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
+//        Map<String, Object> qMap = new HashMap<>();
+//        StockCode stockCode = (StockCode) map.get("stockCode");
+//        qMap.put("exchangeCode", stockCode.getExchangeCode());
+//        qMap.put("trendsList", trendsList);
+//        qMap.put("service","fiveDayDeviation");
+//        //异步计算，获取的值不是实时，存在些偏差
+//        mqutils.sendStr(RabbitMQConfig.TOPIC_EXCHANGE, "five_routing_key" , "1");
+//
+//        mqutils.sendStr(RabbitMQConfig.TOPIC_EXCHANGE, "five_routing_key" , JSON.toJSONString(qMap));
+//        reMap.put("fProportion", redisUtils.get(
+//                new StringBuilder(stockCode.getExchangeCode()).append("_").append("fProportion").toString()));
         return reMap;
     }
 
@@ -107,13 +134,12 @@ public class FuturesCoreAlgorithm implements CoreAlgorithm {
                 //当前
                 double s1 = Double.valueOf(split[1]);
                 //平均
-                double s2 = Double.valueOf(split[2]);
+                double s2 = Double.valueOf(split[4]);
                 BigDecimal s3 = new BigDecimal((s1 - s2) * 100);
                 int f1 = (int) s3.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                 if (s1 >= s2) {
                     plus.add(f1);
                 } else {
-
                     negative.add(Math.abs(f1));
                 }
                 if (j == trendsList.size() - 1) {

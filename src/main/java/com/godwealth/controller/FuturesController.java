@@ -27,11 +27,22 @@ public class FuturesController {
      *
      * @author sie_linhongfei
      * @createDate 2022/07/09 10:27
-     * 期货当日偏离
+     * 期货当日偏离--速度版
      */
     @GetMapping("/futuresData")
     public CommonResult futuresData() throws IOException {
         return new CommonResult(200,"成功",futuresService.futuresData());
+    }
+
+    /**
+     *
+     * @author sie_linhongfei
+     * @createDate 2022/07/09 10:27
+     * 期货当日偏离--复杂版
+     */
+    @GetMapping("/futuresDataComplex")
+    public CommonResult futuresDataComplex() throws IOException {
+        return new CommonResult(200,"成功",futuresService.futuresDataComplex());
     }
 
     /**

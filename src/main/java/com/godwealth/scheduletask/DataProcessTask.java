@@ -32,8 +32,8 @@ public class DataProcessTask {
         }
     }
 
-    //周一至周五每隔两小时执行一次
-    @Scheduled(cron = "0 0 0/2 * * MON-FRI")
+    //周一至周五的上午15:20触发
+    @Scheduled(cron = "0 20 15 ? * MON-FRI")
     public void execute(){
         if (HolidaysUtils.whetherToWork()){
             futuresService.updateFuturesData();
