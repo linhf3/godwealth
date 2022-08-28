@@ -73,6 +73,22 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
                 //List today = (List) node.get(4);
                 //2、进行计算获取数据
                 Map<String, Object> map = calculateData(node,sinaExchangeCode);
+                map.put("name",stockCodeF.getName());
+                String proportion = (String) map.get("proportion");
+                Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
+                if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
+                    stockCodeF.setDownwardDeviation(-100);
+                }
+                if (null == stockCodeF.getDeviation() || 0 == stockCodeF.getDeviation()) {
+                    stockCodeF.setDeviation(100);
+                }
+                if (proportionDouble <= stockCodeF.getDownwardDeviation()) {
+                    map.put("positiveNegativeFlag", -1);
+                } else if (proportionDouble >= stockCodeF.getDeviation()) {
+                    map.put("positiveNegativeFlag", 1);
+                } else {
+                    map.put("positiveNegativeFlag", 0);
+                }
                 list.add(map);
             }
         }
@@ -138,8 +154,6 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         }
         Collections.sort(eightDays);
         Collections.sort(fourteenDays);
-        System.out.println(Arrays.toString(eightDays.toArray()));
-        System.out.println(Arrays.toString(fourteenDays.toArray()));
         double price = (double) todateData.get("price");
         double d8 = 100*(eightDays.get(15)-price)/(eightDays.get(15)-eightDays.get(0));
         double d14 = 100*(fourteenDays.get(27)-price)/(fourteenDays.get(27)-fourteenDays.get(0));
@@ -207,7 +221,6 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         }
         reMap.put("fiveDailySpread",Constant.format.format(v/5));
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
-        System.out.println(reMap.toString());
         return reMap;
     }
 
@@ -270,10 +283,12 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
             proportion = -(index / negatives.length) * 100;
         }
         //找出最大最小值
-        reMap.put("max", Collections.max(price));
-        reMap.put("min", Collections.min(price));
+        Double max = Collections.max(price);
+        Double min = Collections.min(price);
+        reMap.put("max", max);
+        reMap.put("min", min);
+        reMap.put("dailySpread",max-min);
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
-        System.out.println(reMap.toString());
         return reMap;
     }
 }
