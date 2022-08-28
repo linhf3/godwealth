@@ -10,6 +10,7 @@ import com.godwealth.dao.StockCodeMapper;
 import com.godwealth.entity.StockCode;
 import com.godwealth.service.FuturesService;
 import com.godwealth.service.ProportionLogService;
+import com.godwealth.service.SinaFuturesService;
 import com.godwealth.service.StockService;
 import com.godwealth.service.impl.FuturesServiceImpl;
 import com.godwealth.utils.Constant;
@@ -101,16 +102,18 @@ public class StockControllerTest {
 //        futuresService.setFiveDayTotal();
 //        Object fu0 = redisUtils.get("FG0");
 //        System.out.println(fu0);
-       // redisUtils.flushDb();
+       redisUtils.flushDb();
         //futuresService.updateFuturesData();
-        futuresService.setFiveDayTotal();
+       // futuresService.setFiveDayTotal();
+        //LinkedList<Object> objects = new LinkedList<>();
+
 
     }
-
+    @Autowired
+    private SinaFuturesService sFuturesData;
     @org.junit.Test
     public void test4() throws IOException {
-        int front;
-        System.out.println(22);
+        sFuturesData.sFuturesData();
 
     }
 

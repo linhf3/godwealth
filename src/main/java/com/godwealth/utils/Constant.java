@@ -38,4 +38,19 @@ public class Constant {
     public static SimpleDateFormat slf = new SimpleDateFormat("yyyy-MM-dd");
 
     public static DecimalFormat format = new DecimalFormat("#.00");
+
+    //新浪实时数据
+    //1、当日分时图数据
+    public static final String SINA_MIN_LINE = "http://stock2.finance.sina.com.cn/futures/api/jsonp.php/var=/InnerFuturesNewService.getMinLine?symbol=${variety}";
+    //2、五日分时图数据
+    public static final String SINA_FOUR_DAYS_LINE = "http://stock2.finance.sina.com.cn/futures/api/jsonp.php/var=/InnerFuturesNewService.getFourDaysLine?symbol=${variety}";
+    //3、60分钟数据
+    public static final String SINA_FEW_MIN_LINE = "http://stock2.finance.sina.com.cn/futures/api/jsonp.php/var=/InnerFuturesNewService.getFewMinLine?symbol=${variety}&type=60";
+    //4、日线数据(只能获取到前一日数据，前一天收盘后价格)
+    public static final String SINA_DAILY_KLINE = "http://stock2.finance.sina.com.cn/futures/api/jsonp.php/var=/InnerFuturesNewService.getDailyKLine?symbol=${variety}";
+
+
+
+
+
 }
