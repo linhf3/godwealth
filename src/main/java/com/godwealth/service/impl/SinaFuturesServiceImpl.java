@@ -1,6 +1,7 @@
 package com.godwealth.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.godwealth.dao.StockCodeMapper;
 import com.godwealth.entity.StockCode;
@@ -41,15 +42,15 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
 
         //1.查询有效配置
         Map<String, Object> resultMap = new HashMap<>();
-        Object futuresEffectiveList = redisUtils.get("futuresEffectiveList");
+        Object futuresEffectiveList = redisUtils.get("sfuturesEffectiveList");
         List<StockCode> stockCodes = null;
         if (StringUtils.isBlank((CharSequence) futuresEffectiveList)) {
             StockCode stockCode = new StockCode();
             stockCode.setCategory("2");
-            stockCode.setSwEffective("有效");
+            stockCode.setSinaExchangeCode("恭喜发财");
             stockCodes = stockCodeMapper.selectByCondition(stockCode);
             if (!CollectionUtils.isEmpty(stockCodes)) {
-                redisUtils.set("futuresEffectiveList", JSON.toJSONString(stockCodes));
+                redisUtils.set("sfuturesEffectiveList", JSON.toJSONString(stockCodes));
             }
         } else {
             stockCodes = JSONObject.parseArray((String) futuresEffectiveList, StockCode.class);
@@ -61,19 +62,33 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
             for (int i = 0; i < stockCodes.size(); i++) {
                 StockCode stockCodeF = stockCodes.get(i);
                 String sinaExchangeCode = stockCodeF.getSinaExchangeCode();
-                if (StringUtils.isBlank(sinaExchangeCode)){
+                if (StringUtils.isBlank(sinaExchangeCode)) {
                     continue;
                 }
-                //1、直接爬五日数据（包含有当日数据）
-                Map vMap = new HashMap<>();
-                vMap.put("variety", sinaExchangeCode);
+                //1、爬东方财富当日数据
+                //拼接地址
+                Map urlMap = new HashMap<>();
+                urlMap.put("futuresUrl", stockCodeF.getExchangeCode());
                 //发送http请求
-                String rx = HttpUtils.doGet(new StrSubstitutor(vMap).replace(Constant.SINA_FOUR_DAYS_LINE), null);
-                List node = (List) JSON.parseArray(rx.substring(rx.indexOf("["), rx.lastIndexOf("]") + 1));
-                //List today = (List) node.get(4);
-                //2、进行计算获取数据
-                Map<String, Object> map = calculateData(node,sinaExchangeCode);
-                map.put("name",stockCodeF.getName());
+                String rxd = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.futuresUrl), null);
+                Map noded = (Map) JSON.parse(rxd);
+                //数据集
+                Map mapd = (Map) noded.get("data");
+                //转换集合
+                List trendsM = transformationCollection((List) mapd.get("trends"));
+                if (trendsM.size() == 0){
+                    continue;
+                }
+                if (StringUtils.isBlank(stockCodeF.getSinaFiveMinuteChartData())){
+                    continue;
+                }
+                List sfuturesEffectiveListNode = (List) JSON.parseArray(stockCodeF.getSinaFiveMinuteChartData());
+                sfuturesEffectiveListNode.remove(4);
+
+                sfuturesEffectiveListNode.add(trendsM);
+                //3、进行计算获取数据
+                Map<String, Object> map = calculateData(sfuturesEffectiveListNode, stockCodeF);
+                map.put("name", stockCodeF.getName());
                 String proportion = (String) map.get("proportion");
                 Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
                 if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
@@ -100,13 +115,67 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         return resultMap;
     }
 
+    @Override
+    public void getSinaData() throws IOException, InterruptedException {
+        StockCode quStockCode = new StockCode();
+        quStockCode.setCategory("2");
+        quStockCode.setSinaExchangeCode("发财，发大财");
+        List<StockCode> stockCodes = stockCodeMapper.selectByCondition(quStockCode);
+        for (int i = 0; i < stockCodes.size(); i++) {
+            StockCode stockCode = stockCodes.get(i);
+            if (StringUtils.isBlank(stockCode.getSinaExchangeCode())) {
+                continue;
+            }
+            log.debug("爬取五日数据");
+            //2、直接爬五日数据（包含有当日数据）
+            Map vMap = new HashMap<>();
+            vMap.put("variety", stockCode.getSinaExchangeCode());
+            //发送http请求
+            String rx = HttpUtils.sendGet(new StrSubstitutor(vMap).replace(Constant.SINA_FOUR_DAYS_LINE), null);
+            stockCode.setSinaFiveMinuteChartData(rx.substring(rx.indexOf("["), rx.lastIndexOf("]") + 1));
+            //休眠2秒
+            Thread.sleep(3000);
+            //爬日线数据
+            log.debug("爬取日k数据");
+            //发送http请求
+            String rxd = HttpUtils.sendGet(new StrSubstitutor(vMap).replace(Constant.SINA_DAILY_KLINE), null);
+            List list = (List) JSON.parseArray(rxd.substring(rx.indexOf("["), rxd.lastIndexOf("]") + 1));
+            List dayList = list.subList(list.size() - 13, list.size());
+            stockCode.setSinaDailyData(JSON.toJSONString(dayList));
+            //休眠2秒
+            Thread.sleep(4000);
+        }
+        //保存
+        for (int i = 0; i < stockCodes.size(); i++) {
+            stockCodeMapper.updateByPrimaryKeySelective(stockCodes.get(i));
+        }
+    }
+
+
+
+    private List transformationCollection(List list) {
+        LinkedList<List> lists = new LinkedList<>();
+        for (int i = 0; i < list.size(); i++) {
+            String s = (String) list.get(i);
+            String[] split = s.split(",");
+            LinkedList<String> l = new LinkedList<>();
+            l.add(split[0]);
+            l.add(split[1]);
+            l.add(split[4]);
+            l.add(split[2]);
+            l.add(split[3]);
+            lists.add(l);
+        }
+        return lists;
+    }
+
     /**
      * 将数据进行计算
      *
      * @param list
      * @return
      */
-    private Map<String, Object> calculateData(List list,String code) throws IOException {
+    private Map<String, Object> calculateData(List list, StockCode stockCodeF) throws IOException {
         //1、获取一日偏离和最高最低价
         List l = (List) list.get(4);
         //获取一日偏离，高低价，日差
@@ -114,23 +183,17 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         //获取五日偏离，五日差
         Map fiveData = getFiveteData(list);
         //获取wr
-        Map<String, Object> wr = getWr(todateData, code);
+        Map<String, Object> wr = getWr(todateData, stockCodeF);
         todateData.putAll(wr);
-        todateData.put("fProportion",fiveData.get("proportion"));
-        todateData.put("fiveDailySpread",fiveData.get("fiveDailySpread"));
+        todateData.put("fProportion", fiveData.get("proportion"));
+        todateData.put("fiveDailySpread", fiveData.get("fiveDailySpread"));
         return todateData;
 
     }
 
-    private Map<String, Object> getWr(Map todateData,String code) throws IOException {
+    private Map<String, Object> getWr(Map todateData, StockCode stockCodeF) throws IOException {
         Map<String, Object> reMap = new HashMap<>();
-        //查询日k
-         Map vMap = new HashMap<>();
-         vMap.put("variety", code);
-        //发送http请求
-        String rx = HttpUtils.doGet(new StrSubstitutor(vMap).replace(Constant.SINA_DAILY_KLINE), null);
-        List list = (List) JSON.parseArray(rx.substring(rx.indexOf("["), rx.lastIndexOf("]") + 1));
-        List dayList = list.subList(list.size() - 13, list.size());
+        List dayList = (List) JSON.parseArray(stockCodeF.getSinaDailyData());
         List<Double> eightDays = new ArrayList<>();
         List<Double> fourteenDays = new ArrayList<>();
         double toMin = (double) todateData.get("min");
@@ -139,13 +202,13 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         eightDays.add(toMax);
         fourteenDays.add(toMin);
         fourteenDays.add(toMax);
-        for (int i = dayList.size()-1; i>=0; i--) {
+        for (int i = dayList.size() - 1; i >= 0; i--) {
             Map dayL = (Map) dayList.get(i);
             String h = (String) dayL.get("h");
             String l = (String) dayL.get("l");
             Double dh = Double.valueOf(h);
             Double dl = Double.valueOf(l);
-            if (i>=6){
+            if (i >= 6) {
                 eightDays.add(dh);
                 eightDays.add(dl);
             }
@@ -155,10 +218,10 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         Collections.sort(eightDays);
         Collections.sort(fourteenDays);
         double price = (double) todateData.get("price");
-        double d8 = 100*(eightDays.get(15)-price)/(eightDays.get(15)-eightDays.get(0));
-        double d14 = 100*(fourteenDays.get(27)-price)/(fourteenDays.get(27)-fourteenDays.get(0));
-        reMap.put("d8",Constant.format.format(d8));
-        reMap.put("d14",Constant.format.format(d14));
+        double d8 = 100 * (eightDays.get(15) - price) / (eightDays.get(15) - eightDays.get(0));
+        double d14 = 100 * (fourteenDays.get(27) - price) / (fourteenDays.get(27) - fourteenDays.get(0));
+        reMap.put("d8", Constant.format.format(d8));
+        reMap.put("d14", Constant.format.format(d14));
         return reMap;
     }
 
@@ -199,7 +262,7 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
                 }
             }
             //找出最大最小值
-            double d = Collections.max(price)-Collections.min(price);
+            double d = Collections.max(price) - Collections.min(price);
             v += d;
         }
         if (!CollectionUtils.isEmpty(plus) && !CollectionUtils.isEmpty(negative)) {
@@ -219,7 +282,7 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
             index = SortUtils.binarySearch(negatives, 0, negatives.length, curentNum);
             proportion = -(index / negatives.length) * 100;
         }
-        reMap.put("fiveDailySpread",Constant.format.format(v/5));
+        reMap.put("fiveDailySpread", Constant.format.format(v / 5));
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
         return reMap;
     }
@@ -287,7 +350,7 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         Double min = Collections.min(price);
         reMap.put("max", max);
         reMap.put("min", min);
-        reMap.put("dailySpread",max-min);
+        reMap.put("dailySpread", max - min);
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
         return reMap;
     }

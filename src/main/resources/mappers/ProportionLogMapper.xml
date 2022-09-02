@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.godwealth.dao.ProportionLogMapper" >
+  <resultMap id="BaseResultMap" type="com.godwealth.entity.ProportionLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="proportion" property="proportion" jdbcType="VARCHAR" />
+    <result column="add_date" property="addDate" jdbcType="DATE" />
+    <result column="price" property="price" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, name, code, proportion, add_date, price
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from proportion_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from proportion_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.godwealth.entity.ProportionLog" >
+    insert into proportion_log (id, name, code, 
+      proportion, add_date, price
+      )
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{proportion,jdbcType=VARCHAR}, #{addDate,jdbcType=DATE}, #{price,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.godwealth.entity.ProportionLog" >
+    insert into proportion_log
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="proportion != null" >
+        proportion,
+      </if>
+      <if test="addDate != null" >
+        add_date,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="proportion != null" >
+        #{proportion,jdbcType=VARCHAR},
+      </if>
+      <if test="addDate != null" >
+        #{addDate,jdbcType=DATE},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.godwealth.entity.ProportionLog" >
+    update proportion_log
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="proportion != null" >
+        proportion = #{proportion,jdbcType=VARCHAR},
+      </if>
+      <if test="addDate != null" >
+        add_date = #{addDate,jdbcType=DATE},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.godwealth.entity.ProportionLog" >
+    update proportion_log
+    set name = #{name,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      proportion = #{proportion,jdbcType=VARCHAR},
+      add_date = #{addDate,jdbcType=DATE},
+      price = #{price,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insertList"  parameterType="java.util.List">
+    insert into
+    proportion_log(name,code,proportion,add_date,price)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.name},#{item.code},#{item.proportion},now(),#{item.price})
+    </foreach>
+  </insert>
+  <select id="selectByCondition" resultType="com.godwealth.entity.ProportionLog"
+          parameterType="com.godwealth.entity.ProportionLog">
+    select
+    <include refid="Base_Column_List" />
+    from proportion_log
+    <where>
+      <if test="name != null and '' != name" >
+        name like concat(#{name,jdbcType=VARCHAR},'%')
+      </if>
+      <if test="code != null and '' != code" >
+        and code like concat(#{code,jdbcType=VARCHAR},'%')
+      </if>
+      <if test="proportion != null" >
+        and proportion = #{proportion,jdbcType=VARCHAR}
+      </if>
+      <if test="addDate != null" >
+        and add_date = DATE_FORMAT(#{addDate,jdbcType=DATE}, '%Y-%m-%d')
+      </if>
+      <if test="price != null" >
+        and price = #{price,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by add_date desc
+  </select>
+</mapper>

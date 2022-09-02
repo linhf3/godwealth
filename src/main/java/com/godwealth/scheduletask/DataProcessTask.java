@@ -2,6 +2,7 @@ package com.godwealth.scheduletask;
 
 import com.godwealth.service.FuturesService;
 import com.godwealth.service.ProportionLogService;
+import com.godwealth.service.SinaFuturesService;
 import com.godwealth.utils.HolidaysUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,6 +25,9 @@ public class DataProcessTask {
     @Autowired
     private FuturesService futuresService;
 
+    @Autowired
+    private SinaFuturesService sinaFuturesService;
+
     //周一至周五的上午15:10触发
     @Scheduled(cron = "0 10 15 ? * MON-FRI")
     public void collectStockDeviationLogs(){
@@ -45,6 +49,14 @@ public class DataProcessTask {
     public void setFiveDayTotal() throws IOException {
         if (HolidaysUtils.whetherToWork()){
             futuresService.setFiveDayTotal();
+        }
+    }
+
+    //周一至周五的上午15:10触发，获取新浪数据
+    @Scheduled(cron = "0 30 15 ? * MON-FRI")
+    public void getSinaData() throws IOException, InterruptedException {
+        if (HolidaysUtils.whetherToWork()){
+            sinaFuturesService.getSinaData();
         }
     }
 

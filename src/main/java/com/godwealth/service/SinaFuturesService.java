@@ -16,4 +16,5 @@ public interface SinaFuturesService {
 
     Map<String, Object> sFuturesData() throws IOException;
 
+    void getSinaData() throws IOException, InterruptedException;
 }

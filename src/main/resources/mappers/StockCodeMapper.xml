@@ -12,13 +12,17 @@
         <result column="sina_exchange_code" property="sinaExchangeCode" jdbcType="VARCHAR"/>
         <result column="add_user" property="addUser" jdbcType="VARCHAR"/>
         <result column="add_date" property="addDate" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="DATE"/>
         <result column="add_user_id" property="addUserId" jdbcType="INTEGER"/>
         <result column="downward_deviation" property="downwardDeviation" jdbcType="INTEGER"/>
         <result column="deviation" property="deviation" jdbcType="INTEGER"/>
+        <result column="sina_five_minute_chart_data" property="sinaFiveMinuteChartData" jdbcType="LONGVARCHAR"/>
+        <result column="sina_daily_data" property="sinaDailyData" jdbcType="LONGVARCHAR"/>
+        <result column="oriental_fortune_daily_data" property="orientalFrtuneDailyData" jdbcType="LONGVARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
     id, name, stock_code, category, sw_effective, memo, exchange_code,sina_exchange_code, add_user, add_date,
-    add_user_id,downward_deviation,deviation
+    add_user_id,downward_deviation,deviation,sina_five_minute_chart_data,sina_daily_data,oriental_fortune_daily_data
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
         select
@@ -128,11 +132,23 @@
             <if test="exchangeCode != null">
                 exchange_code = #{exchangeCode,jdbcType=VARCHAR},
             </if>
+            <if test="sinaDailyData != null">
+                sina_daily_data = #{sinaDailyData,jdbcType=VARCHAR},
+            </if>
+            <if test="sinaFiveMinuteChartData != null">
+                sina_five_minute_chart_data = #{sinaFiveMinuteChartData,jdbcType=VARCHAR},
+            </if>
+            <if test="orientalFrtuneDailyData != null">
+                oriental_fortune_daily_data = #{orientalFrtuneDailyData,jdbcType=VARCHAR},
+            </if>
             <if test="addUser != null">
                 add_user = #{addUser,jdbcType=VARCHAR},
             </if>
             <if test="addDate != null">
                 add_date = #{addDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
             </if>
             <if test="addUserId != null">
                 add_user_id = #{addUserId,jdbcType=INTEGER},

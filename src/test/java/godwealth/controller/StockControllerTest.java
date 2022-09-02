@@ -93,9 +93,10 @@ public class StockControllerTest {
     }
     @Autowired
     private Mqutils mqutils;
-
+    @Autowired
+    private SinaFuturesService sinaFuturesService;
     @org.junit.Test
-    public void test2() throws IOException {
+    public void test2() throws IOException, InterruptedException {
 //        Object o = redisUtils.get("113.fum");
 //        System.out.println(o);
 //        futuresService.updateFuturesData();
@@ -103,6 +104,7 @@ public class StockControllerTest {
 //        Object fu0 = redisUtils.get("FG0");
 //        System.out.println(fu0);
        redisUtils.flushDb();
+        //sinaFuturesService.getSinaData();
         //futuresService.updateFuturesData();
        // futuresService.setFiveDayTotal();
         //LinkedList<Object> objects = new LinkedList<>();

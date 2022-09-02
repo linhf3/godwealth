@@ -24,11 +24,19 @@ public class StockCode implements Serializable {
 
     private Date addDate;
 
+    private Date updateTime;
+
     private Integer addUserId;
 
     private Integer downwardDeviation;
 
     private Integer deviation;
+
+    private String sinaFiveMinuteChartData;
+
+    private String sinaDailyData;
+
+    private String orientalFrtuneDailyData;
 
     public Integer getDownwardDeviation() {
         return downwardDeviation;
@@ -138,5 +146,37 @@ public class StockCode implements Serializable {
 
     public void setAddUserId(Integer addUserId) {
         this.addUserId = addUserId;
+    }
+
+    public String getSinaFiveMinuteChartData() {
+        return sinaFiveMinuteChartData;
+    }
+
+    public void setSinaFiveMinuteChartData(String sinaFiveMinuteChartData) {
+        this.sinaFiveMinuteChartData = sinaFiveMinuteChartData;
+    }
+
+    public String getSinaDailyData() {
+        return sinaDailyData;
+    }
+
+    public void setSinaDailyData(String sinaDailyData) {
+        this.sinaDailyData = sinaDailyData;
+    }
+
+    public String getOrientalFrtuneDailyData() {
+        return orientalFrtuneDailyData;
+    }
+
+    public void setOrientalFrtuneDailyData(String orientalFrtuneDailyData) {
+        this.orientalFrtuneDailyData = orientalFrtuneDailyData;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

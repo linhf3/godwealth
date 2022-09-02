@@ -5,6 +5,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -30,6 +31,36 @@ public class HttpUtils {
 
         // GET请求
         HttpGet get = new HttpGet(url);
+        // 请求配置
+        get.setConfig(requestConfig());
+
+        // 执行请求
+        return getResult(get);
+    }
+
+    /**
+     * 发送GET请求,专门为获取新浪五日数据改造的get
+     *
+     * @param url         请求URL
+     * @param queryParams 请求参数
+     * @return 响应结果
+     */
+    public static String sendGet(String url, Map<String, Object> queryParams)
+            throws IOException {
+        // 拼接参数
+        if (queryParams != null && !queryParams.isEmpty()) {
+            url += "?" + urlEncode(queryParams);
+        }
+
+        // GET请求
+        HttpGet get = new HttpGet(url);
+        get.setHeader(new BasicHeader("content-type", "application/javascript; charset=gbk"));
+        get.setHeader(new BasicHeader("vary", "Accept-Encoding"));
+        get.setHeader(new BasicHeader("server", "nginx"));
+        get.setHeader(new BasicHeader("x-via-ssl", "ssl.27.sinag1.shx.lb.sinanode.com"));
+        get.setHeader(new BasicHeader("dpool_header", "stock7-finance-sina-com-cn-canary-bc6985f95-qlr2m"));
+        get.setHeader(new BasicHeader("dpool_lb7_header", "draka48"));
+        get.setHeader(new BasicHeader("ddpool", "stock7-finance-sina-com-cn"));
         // 请求配置
         get.setConfig(requestConfig());
 
