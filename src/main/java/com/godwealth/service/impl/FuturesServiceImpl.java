@@ -22,6 +22,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * 期货
@@ -44,6 +48,9 @@ public class FuturesServiceImpl implements FuturesService {
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public Map<String, Object> futuresData() throws IOException {
@@ -268,74 +275,87 @@ public class FuturesServiceImpl implements FuturesService {
         } else {
             futuresDataList = JSONObject.parseArray((String) allFuturesDataList, FuturesData.class);
         }
-
         //3.循环爬数据并计算封装到list中
-        LinkedList<Map<String, Object>> list = new LinkedList<>();
         long startTime = System.currentTimeMillis();
         if (!CollectionUtils.isEmpty(stockCodes)) {
-            for (int i = 0; i < stockCodes.size(); i++) {
-                StockCode stockCodeF = stockCodes.get(i);
-                //拼接地址
-                Map urlMap = new HashMap<>();
-                urlMap.put("futuresUrl", stockCodeF.getExchangeCode());
-                //发送http请求
-                String rx = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.futuresUrl), null);
-                Map node = (Map) JSON.parse(rx);
-                //数据集
-                Map map = (Map) node.get("data");
-                List trendsM = (List) map.get("trends");
-                //白天开盘，无数据的情况（晚上）
-                if (CollectionUtils.isEmpty(trendsM)) {
-                    continue;
-                }
-                Map<String, Object> reMap = coreAlgorithmContet.deviationTheDayRate("futuresCoreAlgorithm", map);
-                reMap.put("name", stockCodeF.getName());
-                String proportion = (String) reMap.get("proportion");
-                Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
-                if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
-                    stockCodeF.setDownwardDeviation(-100);
-                }
-                if (null == stockCodeF.getDeviation() || 0 == stockCodeF.getDeviation()) {
-                    stockCodeF.setDeviation(100);
-                }
-                if (proportionDouble <= stockCodeF.getDownwardDeviation()) {
-                    reMap.put("positiveNegativeFlag", -1);
-                } else if (proportionDouble >= stockCodeF.getDeviation()) {
-                    reMap.put("positiveNegativeFlag", 1);
-                } else {
-                    reMap.put("positiveNegativeFlag", 0);
-                }
-                //获取五日偏离
-                try {
-                    if (!CollectionUtils.isEmpty(futuresDataList)) {
-                        String exchangeCode = stockCodeF.getExchangeCode();
-                        for (int j = 0; j < futuresDataList.size(); j++) {
-                            FuturesData futuresData = futuresDataList.get(j);
-                            if (exchangeCode.equals(futuresData.getExchangeCode())) {
-                                List trendsList = (List) map.get("trends");
-                                List<List> dataList = JSON.parseArray(futuresData.getData(), List.class);
-                                if (!CollectionUtils.isEmpty(dataList) && !CollectionUtils.isEmpty(dataList.get(0))) {
-                                    dataList.add(trendsList);
-                                    String v = coreAlgorithmContet.deviationRateCore("futuresCoreAlgorithm", dataList);
-                                    reMap.put("fProportion", v);
-                                }
-                                break;
-                            }
+            //多线程执行行转译
+            List<FuturesData> finalFuturesDataList = futuresDataList;
+            List<CompletableFuture<Map<String,Object>>> collect = stockCodes.stream().map(stockCodeF -> CompletableFuture.supplyAsync(() ->
+                    //调用别的方法
+                    {
+                        try {
+                            return getData(stockCodeF, finalFuturesDataList);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } else {
-                        reMap.put("fProportion", "");
-                    }
-                } catch (Exception e) {
-                    log.debug("错误信息：{}", e);
-                }
-                list.add(reMap);
-            }
+                        return null;
+                    }, threadPoolExecutor)
+            ).collect(Collectors.toList());
+            //获取返回值
+            List<Map<String,Object>> list = collect.stream().map(CompletableFuture::join).collect(Collectors.toList());
+            resultMap.put("resultList", list);
         }
-        resultMap.put("resultList", list);
         long endTime = System.currentTimeMillis();
         log.debug("执行时长：{}", endTime - startTime);
         log.debug("期货：{}", resultMap);
         return resultMap;
+    }
+
+    public Map<String,Object> getData(StockCode stockCodeF,List<FuturesData> futuresDataList) throws IOException {
+        //拼接地址
+        Map urlMap = new HashMap<>();
+        urlMap.put("futuresUrl", stockCodeF.getExchangeCode());
+        //发送http请求
+        String rx = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.futuresUrl), null);
+        Map node = (Map) JSON.parse(rx);
+        //数据集
+        Map map = (Map) node.get("data");
+        List trendsM = (List) map.get("trends");
+        //白天开盘，无数据的情况（晚上）
+        if (CollectionUtils.isEmpty(trendsM)) {
+            return null;
+        }
+        Map<String, Object> reMap = coreAlgorithmContet.deviationTheDayRate("futuresCoreAlgorithm", map);
+        reMap.put("name", stockCodeF.getName());
+        String proportion = (String) reMap.get("proportion");
+        Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
+        if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
+            stockCodeF.setDownwardDeviation(-100);
+        }
+        if (null == stockCodeF.getDeviation() || 0 == stockCodeF.getDeviation()) {
+            stockCodeF.setDeviation(100);
+        }
+        if (proportionDouble <= stockCodeF.getDownwardDeviation()) {
+            reMap.put("positiveNegativeFlag", -1);
+        } else if (proportionDouble >= stockCodeF.getDeviation()) {
+            reMap.put("positiveNegativeFlag", 1);
+        } else {
+            reMap.put("positiveNegativeFlag", 0);
+        }
+        //获取五日偏离
+        try {
+            if (!CollectionUtils.isEmpty(futuresDataList)) {
+                String exchangeCode = stockCodeF.getExchangeCode();
+                for (int j = 0; j < futuresDataList.size(); j++) {
+                    FuturesData futuresData = futuresDataList.get(j);
+                    if (exchangeCode.equals(futuresData.getExchangeCode())) {
+                        List trendsList = (List) map.get("trends");
+                        List<List> dataList = JSON.parseArray(futuresData.getData(), List.class);
+                        if (!CollectionUtils.isEmpty(dataList) && !CollectionUtils.isEmpty(dataList.get(0))) {
+                            dataList.add(trendsList);
+                            String v = coreAlgorithmContet.deviationRateCore("futuresCoreAlgorithm", dataList);
+                            reMap.put("fProportion", v);
+                        }
+                        break;
+                    }
+                }
+            } else {
+                reMap.put("fProportion", "");
+            }
+        } catch (Exception e) {
+            log.error("异常错误：",e);
+        }
+        return reMap;
     }
 
     /**

@@ -1,8 +1,5 @@
 package com.godwealth.algorithm;
 
-import com.alibaba.fastjson.JSON;
-import com.godwealth.config.RabbitMQConfig;
-import com.godwealth.entity.StockCode;
 import com.godwealth.utils.Constant;
 import com.godwealth.utils.Mqutils;
 import com.godwealth.utils.RedisUtils;

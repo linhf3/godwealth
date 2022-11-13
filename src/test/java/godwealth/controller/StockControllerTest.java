@@ -1,24 +1,14 @@
 package godwealth.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.godwealth.GodWealthApplication;
-import com.godwealth.algorithm.CoreAlgorithm;
-import com.godwealth.algorithm.FuturesCoreAlgorithm;
-import com.godwealth.config.RabbitMQConfig;
 import com.godwealth.dao.StockCodeMapper;
-import com.godwealth.entity.StockCode;
 import com.godwealth.service.FuturesService;
 import com.godwealth.service.ProportionLogService;
 import com.godwealth.service.SinaFuturesService;
 import com.godwealth.service.StockService;
-import com.godwealth.service.impl.FuturesServiceImpl;
-import com.godwealth.utils.Constant;
-import com.godwealth.utils.HttpUtils;
 import com.godwealth.utils.Mqutils;
 import com.godwealth.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.redisson.api.RScoredSortedSet;
@@ -27,17 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
-
-import javax.lang.model.element.VariableElement;
-import javax.mail.MessagingException;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.concurrent.*;
 
 
 /**
@@ -103,8 +85,8 @@ public class StockControllerTest {
 //        futuresService.setFiveDayTotal();
 //        Object fu0 = redisUtils.get("FG0");
 //        System.out.println(fu0);
-       redisUtils.flushDb();
-        //sinaFuturesService.getSinaData();
+       //redisUtils.flushDb();
+        sinaFuturesService.getSinaData();
         //futuresService.updateFuturesData();
        // futuresService.setFiveDayTotal();
         //LinkedList<Object> objects = new LinkedList<>();
@@ -116,6 +98,7 @@ public class StockControllerTest {
     @org.junit.Test
     public void test4() throws IOException {
         sFuturesData.sFuturesData();
+
 
     }
 
