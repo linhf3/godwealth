@@ -1,7 +1,6 @@
 package com.godwealth.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.godwealth.dao.StockCodeMapper;
 import com.godwealth.entity.StockCode;
@@ -20,6 +19,9 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * 期货
@@ -36,6 +38,9 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
 
     @Autowired
     private StockCodeMapper stockCodeMapper;
+
+    @Autowired
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public Map<String, Object> sFuturesData() throws IOException {
@@ -56,56 +61,22 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
             stockCodes = JSONObject.parseArray((String) futuresEffectiveList, StockCode.class);
         }
         //2.循环爬数据并计算封装到list中
-        LinkedList<Map<String, Object>> list = new LinkedList<>();
+        List<Map<String, Object>> list = new LinkedList<>();
         long startTime = System.currentTimeMillis();
         if (!CollectionUtils.isEmpty(stockCodes)) {
-            for (int i = 0; i < stockCodes.size(); i++) {
-                StockCode stockCodeF = stockCodes.get(i);
-                String sinaExchangeCode = stockCodeF.getSinaExchangeCode();
-                if (StringUtils.isBlank(sinaExchangeCode)) {
-                    continue;
-                }
-                //1、爬东方财富当日数据
-                //拼接地址
-                Map urlMap = new HashMap<>();
-                urlMap.put("futuresUrl", stockCodeF.getExchangeCode());
-                //发送http请求
-                String rxd = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.futuresUrl), null);
-                Map noded = (Map) JSON.parse(rxd);
-                //数据集
-                Map mapd = (Map) noded.get("data");
-                //转换集合
-                List trendsM = transformationCollection((List) mapd.get("trends"));
-                if (trendsM.size() == 0){
-                    continue;
-                }
-                if (StringUtils.isBlank(stockCodeF.getSinaFiveMinuteChartData())){
-                    continue;
-                }
-                List sfuturesEffectiveListNode = (List) JSON.parseArray(stockCodeF.getSinaFiveMinuteChartData());
-                sfuturesEffectiveListNode.remove(4);
-
-                sfuturesEffectiveListNode.add(trendsM);
-                //3、进行计算获取数据
-                Map<String, Object> map = calculateData(sfuturesEffectiveListNode, stockCodeF);
-                map.put("name", stockCodeF.getName());
-                String proportion = (String) map.get("proportion");
-                Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
-                if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
-                    stockCodeF.setDownwardDeviation(-100);
-                }
-                if (null == stockCodeF.getDeviation() || 0 == stockCodeF.getDeviation()) {
-                    stockCodeF.setDeviation(100);
-                }
-                if (proportionDouble <= stockCodeF.getDownwardDeviation()) {
-                    map.put("positiveNegativeFlag", -1);
-                } else if (proportionDouble >= stockCodeF.getDeviation()) {
-                    map.put("positiveNegativeFlag", 1);
-                } else {
-                    map.put("positiveNegativeFlag", 0);
-                }
-                list.add(map);
-            }
+            List<CompletableFuture<Map<String,Object>>> collect = stockCodes.stream().map(stockCodeF -> CompletableFuture.supplyAsync(() ->
+                    //调用别的方法
+                    {
+                        try {
+                            return getData(stockCodeF);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }, threadPoolExecutor)
+            ).collect(Collectors.toList());
+            //获取返回值
+            list = collect.stream().map(CompletableFuture::join).collect(Collectors.toList());
         }
         resultMap.put("resultList", list);
         long endTime = System.currentTimeMillis();
@@ -113,6 +84,53 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
         //log.debug("期货：{}", resultMap);
         //数据集
         return resultMap;
+    }
+
+    public Map<String,Object> getData(StockCode stockCodeF) throws IOException {
+        String sinaExchangeCode = stockCodeF.getSinaExchangeCode();
+        if (StringUtils.isBlank(sinaExchangeCode)) {
+            return null;
+        }
+        //1、爬东方财富当日数据
+        //拼接地址
+        Map urlMap = new HashMap<>();
+        urlMap.put("futuresUrl", stockCodeF.getExchangeCode());
+        //发送http请求
+        String rxd = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.futuresUrl), null);
+        Map noded = (Map) JSON.parse(rxd);
+        //数据集
+        Map mapd = (Map) noded.get("data");
+        //转换集合
+        List trendsM = transformationCollection((List) mapd.get("trends"));
+        if (trendsM.size() == 0){
+            return null;
+        }
+        if (StringUtils.isBlank(stockCodeF.getSinaFiveMinuteChartData())){
+            return null;
+        }
+        List sfuturesEffectiveListNode = (List) JSON.parseArray(stockCodeF.getSinaFiveMinuteChartData());
+        sfuturesEffectiveListNode.remove(4);
+
+        sfuturesEffectiveListNode.add(trendsM);
+        //3、进行计算获取数据
+        Map<String, Object> map = calculateData(sfuturesEffectiveListNode, stockCodeF);
+        map.put("name", stockCodeF.getName());
+        String proportion = (String) map.get("proportion");
+        Double proportionDouble = Double.valueOf(proportion.replace("+", "").replace("%", ""));
+        if (null == stockCodeF.getDownwardDeviation() || 0 == stockCodeF.getDownwardDeviation()) {
+            stockCodeF.setDownwardDeviation(-100);
+        }
+        if (null == stockCodeF.getDeviation() || 0 == stockCodeF.getDeviation()) {
+            stockCodeF.setDeviation(100);
+        }
+        if (proportionDouble <= stockCodeF.getDownwardDeviation()) {
+            map.put("positiveNegativeFlag", -1);
+        } else if (proportionDouble >= stockCodeF.getDeviation()) {
+            map.put("positiveNegativeFlag", 1);
+        } else {
+            map.put("positiveNegativeFlag", 0);
+        }
+        return map;
     }
 
     @Override

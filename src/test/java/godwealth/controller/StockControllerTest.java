@@ -64,14 +64,7 @@ public class StockControllerTest {
 
     @Test
     public void test3() throws Exception{
-        RScoredSortedSet<String> set = redisson.getScoredSortedSet("simple");
-        set.add(0.13, "111");
-        set.add(0.12, "131");
-        set.add(0.12, "134");
-        set.add(0.15, "121");
-        System.out.println(set.getScore("131"));
-        System.out.println(set.getScore("134"));
-        //futuresService.updateFuturesSourceData();
+        futuresService.updateFuturesSourceData();
     }
     @Autowired
     private Mqutils mqutils;
