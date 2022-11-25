@@ -570,21 +570,26 @@ public class FuturesServiceImpl implements FuturesService {
                 //发送http请求
                 String rx = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.SINADATEURL), null);
                 List list = (List) JSON.parse(rx);
-                List sublist = list.subList(list.size() - 5, list.size());
-                System.out.println(sublist);
+                List sublist = null;
                 double allH = 0.00d;
                 double allL = 0.00d;
-                for (int i1 = 0; i1 < sublist.size(); i1++) {
-                    List qList = (List) sublist.get(i1);
-                    Object[] objects = qList.toArray();
-                    String h = (String) objects[2];
-                    String l = (String) objects[3];
-                    allH += Double.valueOf(h);
-                    allL += Double.valueOf(l);
+                if (!CollectionUtils.isEmpty(list) && list.size() == 5){
+                    sublist = list.subList(list.size() - 5, list.size());
                 }
-                log.debug(stockCodeSina.getSinaExchangeCode() + ":{}", String.valueOf((allH - allL) / 5));
-                redisUtils.set(stockCodeSina.getSinaExchangeCode(), String.valueOf((allH - allL) / 5));
-                redisUtils.persist(stockCodeSina.getSinaExchangeCode());
+
+                if (!CollectionUtils.isEmpty(sublist)){
+                    for (int i1 = 0; i1 < sublist.size(); i1++) {
+                        List qList = (List) sublist.get(i1);
+                        Object[] objects = qList.toArray();
+                        String h = (String) objects[2];
+                        String l = (String) objects[3];
+                        allH += Double.valueOf(h);
+                        allL += Double.valueOf(l);
+                    }
+                    log.debug(stockCodeSina.getSinaExchangeCode() + ":{}", String.valueOf((allH - allL) / 5));
+                    redisUtils.set(stockCodeSina.getSinaExchangeCode(), String.valueOf((allH - allL) / 5));
+                    redisUtils.persist(stockCodeSina.getSinaExchangeCode());
+                }
             }
         }
     }

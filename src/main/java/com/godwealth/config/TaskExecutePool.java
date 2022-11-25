@@ -21,8 +21,8 @@ public class TaskExecutePool {
      */
     @Bean
     public ThreadPoolExecutor threadPoolExecutor() {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(20, 40,
-                600, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(20));
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(40, 120,
+                600, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2000));
         return executor;
     }
 

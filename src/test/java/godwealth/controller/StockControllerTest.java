@@ -78,8 +78,8 @@ public class StockControllerTest {
 //        futuresService.setFiveDayTotal();
 //        Object fu0 = redisUtils.get("FG0");
 //        System.out.println(fu0);
-       //redisUtils.flushDb();
-        sinaFuturesService.getSinaData();
+       redisUtils.flushDb();
+        //sinaFuturesService.getSinaData();
         //futuresService.updateFuturesData();
        // futuresService.setFiveDayTotal();
         //LinkedList<Object> objects = new LinkedList<>();

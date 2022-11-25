@@ -103,7 +103,7 @@ public class HttpUtils {
                 // 请求超时时间
                 .setConnectionRequestTimeout(35000)
                 // 数据读取超时时间
-                .setSocketTimeout(60000)
+                .setSocketTimeout(600000)
                 .build();
     }
 

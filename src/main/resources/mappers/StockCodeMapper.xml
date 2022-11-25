@@ -136,10 +136,10 @@
                 sina_daily_data = #{sinaDailyData,jdbcType=VARCHAR},
             </if>
             <if test="sinaFiveMinuteChartData != null">
-                sina_five_minute_chart_data = #{sinaFiveMinuteChartData,jdbcType=VARCHAR},
+                sina_five_minute_chart_data = #{sinaFiveMinuteChartData,jdbcType=LONGVARCHAR},
             </if>
             <if test="orientalFrtuneDailyData != null">
-                oriental_fortune_daily_data = #{orientalFrtuneDailyData,jdbcType=VARCHAR},
+                oriental_fortune_daily_data = #{orientalFrtuneDailyData,jdbcType=LONGVARCHAR},
             </if>
             <if test="addUser != null">
                 add_user = #{addUser,jdbcType=VARCHAR},
@@ -185,7 +185,7 @@
                 and category = #{category,jdbcType=CHAR}
             </if>
             <if test="sinaExchangeCode != null and '' != sinaExchangeCode">
-                and sina_exchange_code is not null
+                and (sina_exchange_code is not null and sina_exchange_code != '')
             </if>
         </where>
         order by sw_effective desc,category desc

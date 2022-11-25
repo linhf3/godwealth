@@ -3,13 +3,18 @@ spring:
     host: 175.178.184.40
     port: 6379
     password:
-    lettuce:
-      pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 8
-        max-wait: 8
-      shutdown-timeout: 20000ms
+#    lettuce:
+#      cluster:
+#        refresh:
+#          adaptive: true
+#          period: 600000
+#      pool:
+#        max-active: 8
+#        max-idle: 5
+#        min-idle: 0
+#        max-wait: -1
+    connect-timeout: 6000
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://175.178.184.40:3344/godwealth?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true

@@ -44,7 +44,7 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
 
     @Override
     public Map<String, Object> sFuturesData() throws IOException {
-
+        log.debug("接收到请求");
         //1.查询有效配置
         Map<String, Object> resultMap = new HashMap<>();
         Object futuresEffectiveList = redisUtils.get("sfuturesEffectiveList");
@@ -78,11 +78,19 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
             //获取返回值
             list = collect.stream().map(CompletableFuture::join).collect(Collectors.toList());
         }
-        resultMap.put("resultList", list);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            Map<String, Object> map = list.get(i);
+            if (!CollectionUtils.isEmpty(map)){
+                resultList.add(map);
+            }
+        }
+        resultMap.put("resultList", resultList);
         long endTime = System.currentTimeMillis();
         log.debug("执行时长：{}", endTime - startTime);
         //log.debug("期货：{}", resultMap);
         //数据集
+        log.debug("返回结果");
         return resultMap;
     }
 
@@ -301,6 +309,7 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
             proportion = -(index / negatives.length) * 100;
         }
         reMap.put("fiveDailySpread", Constant.format.format(v / 5));
+        reMap.put("sort",proportion);
         reMap.put("proportion", proportion > 0 ? "+" + Math.round(proportion) + "%" : Math.round(proportion) + "%");
         return reMap;
     }

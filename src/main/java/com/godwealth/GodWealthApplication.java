@@ -1,5 +1,6 @@
 package com.godwealth;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,10 +18,12 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableScheduling
 @MapperScan("com.godwealth.dao")
+@Slf4j
 public class GodWealthApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(GodWealthApplication.class, args);
+        log.debug("==================================启动成功=====================================");
     }
 
    @Bean
