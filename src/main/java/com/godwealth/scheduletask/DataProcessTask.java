@@ -29,28 +29,28 @@ public class DataProcessTask {
     private SinaFuturesService sinaFuturesService;
 
     //周一至周五的上午15:10触发
-    @Scheduled(cron = "0 10 15 ? * MON-FRI")
-    public void collectStockDeviationLogs(){
-        if (HolidaysUtils.whetherToWork()){
-            proportionLogService.collectStockDeviationLogs();
-        }
-    }
+//    @Scheduled(cron = "0 10 15 ? * MON-FRI")
+//    public void collectStockDeviationLogs(){
+//        if (HolidaysUtils.whetherToWork()){
+//            proportionLogService.collectStockDeviationLogs();
+//        }
+//    }
 
     //周一至周五的上午15:20触发
-    @Scheduled(cron = "0 20 15 ? * MON-FRI")
-    public void execute(){
-        if (HolidaysUtils.whetherToWork()){
-            futuresService.updateFuturesData();
-        }
-    }
+//    @Scheduled(cron = "0 20 15 ? * MON-FRI")
+//    public void execute(){
+//        if (HolidaysUtils.whetherToWork()){
+//            futuresService.updateFuturesData();
+//        }
+//    }
 
     //周一至周五的上午15:10触发设置四天差值，为了获取五日均值
-    @Scheduled(cron = "0 */1 6-23 ? * *")
-    public void setFiveDayTotal() throws IOException {
-        if (HolidaysUtils.whetherToWork()){
-            futuresService.setFiveDayTotal();
-        }
-    }
+//    @Scheduled(cron = "0 */1 6-23 ? * *")
+//    public void setFiveDayTotal() throws IOException {
+//        if (HolidaysUtils.whetherToWork()){
+//            futuresService.setFiveDayTotal();
+//        }
+//    }
 
     //周一至周五的上午15:10触发，获取新浪数据
     @Scheduled(cron = "0 30 15 ? * MON-FRI")

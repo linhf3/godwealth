@@ -7,7 +7,6 @@ import com.godwealth.entity.StockCode;
 import com.godwealth.service.SinaFuturesService;
 import com.godwealth.utils.Constant;
 import com.godwealth.utils.HttpUtils;
-import com.godwealth.utils.RedisUtils;
 import com.godwealth.utils.SortUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,8 +41,10 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
 
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;
-
+    //存放类似redis到数据
     ConcurrentHashMap cMap = new ConcurrentHashMap();
+    //存放已发送过到数据(10分钟清空一次)
+    ConcurrentHashMap sMap = new ConcurrentHashMap();
 
     @Override
     public Map<String, Object> sFuturesData() throws IOException {
