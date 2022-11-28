@@ -27,24 +27,24 @@ public class MyConfiguration {
      * 配置自定义redisTemplate
      *
      */
-    @Bean
-    RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory);
-        //使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
-        Jackson2JsonRedisSerializer serializer = new Jackson2JsonRedisSerializer(Object.class);
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        serializer.setObjectMapper(mapper);
-        template.setValueSerializer(serializer);
-        //使用StringRedisSerializer来序列化和反序列化redis的key值
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(serializer);
-        template.afterPropertiesSet();
-        return template;
-    }
+//    @Bean
+//    RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+//        RedisTemplate<String, Object> template = new RedisTemplate<>();
+//        template.setConnectionFactory(redisConnectionFactory);
+//        //使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
+//        Jackson2JsonRedisSerializer serializer = new Jackson2JsonRedisSerializer(Object.class);
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+//        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+//        serializer.setObjectMapper(mapper);
+//        template.setValueSerializer(serializer);
+//        //使用StringRedisSerializer来序列化和反序列化redis的key值
+//        template.setKeySerializer(new StringRedisSerializer());
+//        template.setHashKeySerializer(new StringRedisSerializer());
+//        template.setHashValueSerializer(serializer);
+//        template.afterPropertiesSet();
+//        return template;
+//    }
 
     //跨域处理
     @Bean
@@ -67,14 +67,14 @@ public class MyConfiguration {
      *
      * @return RedissonClient
      */
-    @Bean
-    public RedissonClient getRedisson() {
-        Config config = new Config();
-        config.useSingleServer().setAddress("redis://175.178.184.40:6379");
-        RedissonClient redisson = Redisson.create(config);
-        log.info("成功连接Redis Server");
-        return redisson;
-    }
+//    @Bean
+//    public RedissonClient getRedisson() {
+//        Config config = new Config();
+//        config.useSingleServer().setAddress("redis://175.178.184.40:6379");
+//        RedissonClient redisson = Redisson.create(config);
+//        log.info("成功连接Redis Server");
+//        return redisson;
+//    }
 
 
 }

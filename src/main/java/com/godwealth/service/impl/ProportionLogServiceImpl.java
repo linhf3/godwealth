@@ -25,8 +25,8 @@ public class ProportionLogServiceImpl implements ProportionLogService {
     @Autowired
     private CoreAlgorithmContet coreAlgorithmContet;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    //@Autowired
+    //private RestTemplate restTemplate;
 
     @Autowired
     private StockService stockService;
@@ -34,7 +34,7 @@ public class ProportionLogServiceImpl implements ProportionLogService {
     //爬数据
     @Override
     public void collectStockDeviationLogs() {
-        String rx = restTemplate.getForObject(Constant.url,String.class);
+        String rx = "";//restTemplate.getForObject(Constant.url,String.class);
         String substring = rx.substring(rx.indexOf("({")+1, rx.length()-2);
         Map node = (Map) JSON.parse(substring);
         Map data = (Map) node.get("data");

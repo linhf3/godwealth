@@ -33,14 +33,14 @@ public class ForeignExchangeServiceImpl implements ForeignExchangeService {
     private StockCodeMapper stockCodeMapper;
     @Autowired
     private CoreAlgorithmContet coreAlgorithmContet;
-    @Autowired
-    private RedisUtils redisUtils;
+    //@Autowired
+    //private RedisUtils redisUtils;
     @Override
     public Map<String, Object> foreignExchangeData() throws IOException {
         Map<String, Object> resultMap = new HashMap<>();
         StringBuilder sb = new StringBuilder("");
         //1.查询有效配置
-        Object foreignExchangeList = redisUtils.get("foreignExchangeList");
+        Object foreignExchangeList = null;//redisUtils.get("foreignExchangeList");
         List<StockCode> stockCodes = null;
         if (StringUtils.isBlank((CharSequence) foreignExchangeList)) {
             StockCode stockCode = new StockCode();
@@ -48,7 +48,7 @@ public class ForeignExchangeServiceImpl implements ForeignExchangeService {
             stockCode.setSwEffective("有效");
             stockCodes = stockCodeMapper.selectByCondition(stockCode);
             if (!CollectionUtils.isEmpty(stockCodes)) {
-                redisUtils.set("foreignExchangeList", JSON.toJSONString(stockCodes));
+                //redisUtils.set("foreignExchangeList", JSON.toJSONString(stockCodes));
             }
         } else {
             stockCodes = JSONObject.parseArray((String) foreignExchangeList, StockCode.class);

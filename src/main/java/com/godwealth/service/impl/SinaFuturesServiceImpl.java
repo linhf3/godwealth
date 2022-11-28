@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
@@ -33,8 +34,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SinaFuturesServiceImpl implements SinaFuturesService {
 
-    @Autowired
-    private RedisUtils redisUtils;
+//    @Autowired
+//    private RedisUtils redisUtils;
 
     @Autowired
     private StockCodeMapper stockCodeMapper;
@@ -42,12 +43,15 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
     @Autowired
     private ThreadPoolExecutor threadPoolExecutor;
 
+    ConcurrentHashMap cMap = new ConcurrentHashMap();
+
     @Override
     public Map<String, Object> sFuturesData() throws IOException {
         log.debug("接收到请求");
+
         //1.查询有效配置
         Map<String, Object> resultMap = new HashMap<>();
-        Object futuresEffectiveList = redisUtils.get("sfuturesEffectiveList");
+        Object futuresEffectiveList = cMap.get("sfuturesEffectiveList");// redisUtils.get("sfuturesEffectiveList");
         List<StockCode> stockCodes = null;
         if (StringUtils.isBlank((CharSequence) futuresEffectiveList)) {
             StockCode stockCode = new StockCode();
@@ -55,7 +59,7 @@ public class SinaFuturesServiceImpl implements SinaFuturesService {
             stockCode.setSinaExchangeCode("恭喜发财");
             stockCodes = stockCodeMapper.selectByCondition(stockCode);
             if (!CollectionUtils.isEmpty(stockCodes)) {
-                redisUtils.set("sfuturesEffectiveList", JSON.toJSONString(stockCodes));
+                cMap.put("sfuturesEffectiveList", JSON.toJSONString(stockCodes));
             }
         } else {
             stockCodes = JSONObject.parseArray((String) futuresEffectiveList, StockCode.class);

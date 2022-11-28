@@ -45,14 +45,14 @@ public class StockServiceImpl implements StockService {
     @Autowired
     private StockLogMapper stockLogMapper;
 
-    @Autowired
-    private RedisUtils redisUtils;
+//    @Autowired
+//    private RedisUtils redisUtils;
 
     @Override
     public Map<String,Object> stockData() throws GeneralSecurityException, MessagingException {
         Map<String, Object> resultMap = new HashMap<>();
         //1.查询有效配置
-        Object stocksEffectiveList = redisUtils.get("stocksEffectiveList");
+        Object stocksEffectiveList = null; // redisUtils.get("stocksEffectiveList");
         List<StockCode> stockCodes = null;
         if (StringUtils.isBlank((CharSequence) stocksEffectiveList)){
             StockCode stockCode = new StockCode();
@@ -60,7 +60,7 @@ public class StockServiceImpl implements StockService {
             stockCode.setCategory("1");
             stockCodes = stockCodeMapper.selectByCondition(stockCode);
             if (!CollectionUtils.isEmpty(stockCodes)){
-                redisUtils.set("stocksEffectiveList",JSON.toJSONString(stockCodes));
+               // redisUtils.set("stocksEffectiveList",JSON.toJSONString(stockCodes));
             }
         }else {
             stockCodes = JSONObject.parseArray((String) stocksEffectiveList, StockCode.class);
@@ -148,7 +148,7 @@ public class StockServiceImpl implements StockService {
                 hash.put("positiveNegativeFlag",0);
             }
 
-            Object stocksEffectiveListObject = redisUtils.get(new StringBuilder((String) hash.get("code")).append("_buy_log").toString());
+            Object stocksEffectiveListObject = null; //redisUtils.get(new StringBuilder((String) hash.get("code")).append("_buy_log").toString());
             List<StockLog> stockLogs = null;
             if (StringUtils.isBlank((CharSequence) stocksEffectiveListObject)){
                 //查询结果，是否存在买有的数据
@@ -159,7 +159,7 @@ public class StockServiceImpl implements StockService {
                 qStockLog.setStockCode((String) hash.get("code"));
                 stockLogs = stockLogMapper.selectByCondition(qStockLog);
                 if (!CollectionUtils.isEmpty(stockLogs)){
-                    redisUtils.set(new StringBuilder((String) hash.get("code")).append("_buy_log").toString(),JSON.toJSONString(stockLogs));
+                    //redisUtils.set(new StringBuilder((String) hash.get("code")).append("_buy_log").toString(),JSON.toJSONString(stockLogs));
                 }
             }else {
                 stockLogs = JSONObject.parseArray((String) stocksEffectiveListObject, StockLog.class);
@@ -259,12 +259,12 @@ public class StockServiceImpl implements StockService {
     @Override
     public Map<String,Object> insertSelective(StockCode stockCode) {
         Map<String, Object> resultMap = new HashMap<>();
-        redisUtils.delete("stocksEffectiveList");
-        redisUtils.delete("futuresEffectiveList");
-        redisUtils.delete("allFuturesDataList");
-        redisUtils.deleteEndWith("_buy_log");
-        int resultNumber = stockCodeMapper.insertSelective(stockCode);
-        resultMap.put("resultNumber",resultNumber);
+//        redisUtils.delete("stocksEffectiveList");
+//        redisUtils.delete("futuresEffectiveList");
+//        redisUtils.delete("allFuturesDataList");
+//        redisUtils.deleteEndWith("_buy_log");
+//        int resultNumber = stockCodeMapper.insertSelective(stockCode);
+//        resultMap.put("resultNumber",resultNumber);
         return resultMap;
     }
 
@@ -283,12 +283,12 @@ public class StockServiceImpl implements StockService {
     @Override
     public Map<String,Object> updateByStockCode(StockCode stockCode) {
         Map<String, Object> resultMap = new HashMap<>();
-        redisUtils.delete("stocksEffectiveList");
-        redisUtils.delete("futuresEffectiveList");
-        redisUtils.delete("allFuturesDataList");
-        redisUtils.deleteEndWith("_buy_log");
-        int resultNumber = stockCodeMapper.updateByStockCode(stockCode);
-        resultMap.put("resultNumber",resultNumber);
+//        redisUtils.delete("stocksEffectiveList");
+//        redisUtils.delete("futuresEffectiveList");
+//        redisUtils.delete("allFuturesDataList");
+//        redisUtils.deleteEndWith("_buy_log");
+//        int resultNumber = stockCodeMapper.updateByStockCode(stockCode);
+//        resultMap.put("resultNumber",resultNumber);
         return resultMap;
     }
 }
