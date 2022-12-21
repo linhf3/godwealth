@@ -26,6 +26,11 @@ public class SinaFuturesController {
         return new CommonResult(200,"成功",sFuturesData.sFuturesData());
     }
 
+    @GetMapping("/sfuturesDatas")
+    public CommonResult sfuturesDatas() throws IOException {
+        return new CommonResult(200,"成功",sFuturesData.sFuturesDatas());
+    }
+
 
 
 
