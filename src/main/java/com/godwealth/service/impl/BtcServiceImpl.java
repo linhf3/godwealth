@@ -1,6 +1,7 @@
 package com.godwealth.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.godwealth.entity.ResultEntity;
 import com.godwealth.service.BtcService;
 import com.godwealth.utils.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class BtcServiceImpl implements BtcService {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     DecimalFormat df= new DecimalFormat("#.00");
     public Map<String,Object> getBtc(){
-        Map<String, Object> respMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
         Date date = new Date();
         String d = sdf.format(date);
         String rx = null;
@@ -57,29 +58,33 @@ public class BtcServiceImpl implements BtcService {
             double zhangfu = (prcie-ydPrcie)/ydPrcie*100;
             Double z1 = priceLinkListAll.get(0);
             Double z2 = priceLinkListAll.get(priceLinkListAll.size()-1);
-            respMap.put("name","新闻联播");
-            respMap.put("price",prcie);
-            respMap.put("zhangfu",df.format(zhangfu));
-            //振幅
-            respMap.put("zf",df.format((z2-z1)/z1*100));
+            List<ResultEntity> resultList = new ArrayList<>();
+            ResultEntity resultEntity = new ResultEntity();
+            resultEntity.setName("BTC");
+            resultEntity.setPrice(prcie);
+            resultEntity.setZhangfu(df.format(zhangfu));
+            resultEntity.setZf(df.format((z2-z1)/z1*100));
             //当前价格振幅
             double dzf1 = (prcie-z1)/z1*100;
             double dzf2 = Math.abs((prcie-z2)/z2*100);
             double d1 = dzf1>=dzf2?dzf1:dzf2;
             //振幅
-            respMap.put("bzf",dzf1>=dzf2?new StringBuilder("+").append(df.format(d1)).toString():new StringBuilder("-").append(df.format(d1)).toString());
+            resultEntity.setBzf(dzf1>=dzf2?new StringBuilder("+").append(df.format(d1)).toString():new StringBuilder("-").append(df.format(d1)).toString());
+            resultList.add(resultEntity);
+            resultMap.put("resultList", resultList);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        log.debug("当前价格：{}",respMap);
-        return respMap;
+
+        log.debug("当前价格：{}",resultMap);
+        return resultMap;
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        while (true){
-            new BtcServiceImpl().getBtc();
-            Thread.sleep(6000);
-        }
-    }
+//    public static void main(String[] args) throws InterruptedException {
+//        while (true){
+//            new BtcServiceImpl().getBtc();
+//            Thread.sleep(6000);
+//        }
+//    }
 
 }
