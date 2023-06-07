@@ -32,8 +32,13 @@ public class ResultEntity implements Comparable<ResultEntity>{
     private String zhangfu;
     //振幅
     private String zf;
-    //当前价格振幅
-    private String bzf;
+    //当前价格上振幅
+    private String szf;
+    //当前价格下振幅
+    private String xzf;
+    //点差
+    private double dc;
+
     @Override
     public int compareTo(ResultEntity o) {
         if (Math.abs(o.getSort()) > Math.abs(this.sort)){

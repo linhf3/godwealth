@@ -60,7 +60,7 @@ public class BtcServiceImpl implements BtcService {
             Double z2 = priceLinkListAll.get(priceLinkListAll.size()-1);
             List<ResultEntity> resultList = new ArrayList<>();
             ResultEntity resultEntity = new ResultEntity();
-            resultEntity.setName("BTC");
+            resultEntity.setName("B");
             resultEntity.setPrice(prcie);
             resultEntity.setZhangfu(df.format(zhangfu));
             resultEntity.setZf(df.format((z2-z1)/z1*100));
@@ -69,7 +69,9 @@ public class BtcServiceImpl implements BtcService {
             double dzf2 = Math.abs((prcie-z2)/z2*100);
             double d1 = dzf1>=dzf2?dzf1:dzf2;
             //振幅
-            resultEntity.setBzf(dzf1>=dzf2?new StringBuilder("+").append(df.format(d1)).toString():new StringBuilder("-").append(df.format(d1)).toString());
+            resultEntity.setSzf(new StringBuilder("+").append(df.format(d1)).toString());
+            resultEntity.setXzf(new StringBuilder("-").append(df.format(dzf2)).toString());
+            resultEntity.setDc(z2-z1);
             resultList.add(resultEntity);
             resultMap.put("resultList", resultList);
         } catch (IOException e) {
