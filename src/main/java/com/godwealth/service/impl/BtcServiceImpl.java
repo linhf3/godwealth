@@ -21,6 +21,7 @@ public class BtcServiceImpl implements BtcService {
     //yyyy-MM-dd HH:mm:ss 转换的时间格式  可以自定义
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     DecimalFormat df= new DecimalFormat("#.00");
+    DecimalFormat df1= new DecimalFormat("#.0");
     public Map<String,Object> getBtc(){
         Map<String, Object> resultMap = new HashMap<>();
         Date date = new Date();
@@ -71,7 +72,7 @@ public class BtcServiceImpl implements BtcService {
             //振幅
             resultEntity.setSzf(new StringBuilder("+").append(df.format(d1)).toString());
             resultEntity.setXzf(new StringBuilder("-").append(df.format(dzf2)).toString());
-            resultEntity.setDc(z2-z1);
+            resultEntity.setDc(df1.format(z2-z1));
             resultList.add(resultEntity);
             resultMap.put("resultList", resultList);
         } catch (IOException e) {

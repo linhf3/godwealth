@@ -37,7 +37,7 @@ public class ResultEntity implements Comparable<ResultEntity>{
     //当前价格下振幅
     private String xzf;
     //点差
-    private double dc;
+    private String dc;
 
     @Override
     public int compareTo(ResultEntity o) {
