@@ -2,6 +2,7 @@ package com.godwealth.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.godwealth.dao.FuturesDataMapper;
+import com.godwealth.entity.BtcEntity;
 import com.godwealth.entity.FuturesData;
 import com.godwealth.entity.ResultEntity;
 import com.godwealth.service.BtcAndFuturesService;
@@ -17,6 +18,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +27,8 @@ import java.util.stream.Collectors;
 public class BtcAndFuturesServiceImpl implements BtcAndFuturesService {
 
     private LinkedList<FuturesData> linkedList = new LinkedList<>();
+    @Autowired
+    private ThreadPoolExecutor threadPoolExecutor;
     @Autowired
     private FuturesDataMapper futuresDataMapper;
 
@@ -92,24 +97,37 @@ public class BtcAndFuturesServiceImpl implements BtcAndFuturesService {
     }
 
     @Override
-    public Map<String, Object> getFutures() throws IOException {
+    public List<BtcEntity> getFutures() throws IOException {
         Map<String, Object> map = new HashMap<>();
         //获取数据库数据
         long startTime = System.currentTimeMillis();
         log.debug("开始时间：{}",startTime);
-        FuturesData futuresData1 = new FuturesData();
-        futuresData1.setExchangeCode("114.pm");
-        linkedList.add(futuresData1);
+        //FuturesData futuresData1 = new FuturesData();
+        //futuresData1.setExchangeCode("114.pm");
+        //linkedList.add(futuresData1);
         if (CollectionUtils.isEmpty(linkedList)){
             linkedList = futuresDataMapper.selectSts();
         }
         if (CollectionUtils.isEmpty(linkedList)){
             return null;
         }
-        ResultEntity resultEntity = new ResultEntity();
+        List<BtcEntity> list = new LinkedList<>();
+        List<CompletableFuture<BtcEntity>> collect = linkedList.stream().map(futuresData -> CompletableFuture.supplyAsync(() ->
+                        //调用方法
+                {
+                    try {
+                        return getData(futuresData);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }, threadPoolExecutor)
+        ).collect(Collectors.toList());
+        //获取返回值
+        list = collect.stream().map(CompletableFuture::join).collect(Collectors.toList());
 
         //1、爬东方财富当日数据
-        for (int i = 0; i < linkedList.size(); i++) {
+        /*for (int i = 0; i < linkedList.size(); i++) {
             List<Double> priceLinkList = new LinkedList<Double>();
             List<Double> priceLinkListAll = new LinkedList<Double>();
             FuturesData futuresData = linkedList.get(i);
@@ -117,7 +135,10 @@ public class BtcAndFuturesServiceImpl implements BtcAndFuturesService {
             Map urlMap = new HashMap<>();
             urlMap.put("secid", futuresData.getExchangeCode());
             //发送http请求
+            long startTime1 = System.currentTimeMillis();
             String rxd = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.URL), null);
+            long endTime1 = System.currentTimeMillis();
+            log.debug("执行时长：{}", endTime1 - startTime1);
             Map noded = (Map) JSON.parse(rxd);
             //数据集
             Map mapd = (Map) noded.get("data");
@@ -135,8 +156,6 @@ public class BtcAndFuturesServiceImpl implements BtcAndFuturesService {
             map.put("zhangfu",new StringBuilder(df.format(zhangfu)).append("%"));
             //当前价格
             map.put("price",price);
-            //振幅
-
             //波动
             Double maxPrice = priceLinkListAll.get(priceLinkListAll.size() - 1);
             Double minPrice = priceLinkListAll.get(0);
@@ -149,17 +168,57 @@ public class BtcAndFuturesServiceImpl implements BtcAndFuturesService {
             map.put("xz",new StringBuilder(df.format(xz)).append("%"));
             //振幅
             map.put("zf",new StringBuilder(df.format(sz-xz)).append("%"));
-            return map;
+            long endTime = System.currentTimeMillis();
+            log.debug("执行时长：{}", endTime - startTime);*/
+        log.debug("list:{}",list);
+        Collections.sort(list);
+            return list;
         }
 
-
-
-
-
-
-
-
-        return null;
+    private BtcEntity getData(FuturesData futuresData) throws IOException {
+        BtcEntity btcEntity = new BtcEntity();
+        List<Double> priceLinkList = new LinkedList<Double>();
+        List<Double> priceLinkListAll = new LinkedList<Double>();
+        //拼接地址
+        Map urlMap = new HashMap<>();
+        urlMap.put("secid", futuresData.getExchangeCode());
+        //发送http请求
+        long startTime1 = System.currentTimeMillis();
+        String rxd = HttpUtils.doGet(new StrSubstitutor(urlMap).replace(Constant.URL), null);
+        long endTime1 = System.currentTimeMillis();
+        log.debug("执行时长：{}", endTime1 - startTime1);
+        Map noded = (Map) JSON.parse(rxd);
+        //数据集
+        Map mapd = (Map) noded.get("data");
+        List<Map<String,Object>> hisPrePrices = (List) mapd.get("hisPrePrices");
+        String preClose = String.valueOf(hisPrePrices.get(0).get("prePrice"));
+        //前一天收盘价
+        double pre = Double.valueOf(preClose);
+        //当前价格
+        String price =  transformationCollection((List) mapd.get("trends"),priceLinkListAll);
+        priceLinkListAll = priceLinkListAll.stream().distinct().collect(Collectors.toList());
+        Collections.sort(priceLinkListAll);
+        //涨幅
+        Double p = Double.valueOf(price);
+        double zhangfu = (p-pre)/pre*100;
+        btcEntity.setZhangfu(new StringBuilder(df.format(zhangfu)).append("%").toString());
+        //当前价格
+        btcEntity.setPrice(Double.valueOf(price));
+        //波动
+        Double maxPrice = priceLinkListAll.get(priceLinkListAll.size() - 1);
+        Double minPrice = priceLinkListAll.get(0);
+        btcEntity.setDc(maxPrice - minPrice);
+        //上振
+        Double sz = (p-minPrice)/minPrice*100;
+        btcEntity.setSz(new StringBuilder(df.format(sz)).append("%").toString());
+        //下振
+        Double xz = (p-maxPrice)/maxPrice*100;
+        btcEntity.setXz(new StringBuilder(df.format(xz)).append("%").toString());
+        //振幅
+        btcEntity.setSort(sz-xz);
+        btcEntity.setZf(new StringBuilder(df.format(sz-xz)).append("%").toString());
+        btcEntity.setName(futuresData.getName().substring(0,1));
+        return btcEntity;
     }
 
     private String transformationCollection(List trends, List<Double> priceLinkListAll) {

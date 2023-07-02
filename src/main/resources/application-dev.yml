@@ -17,18 +17,20 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://175.178.184.40:3344/godwealth?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
-    #url: jdbc:mysql://localhost:3306/godwealth?useUnicode=true&characterEncoding=utf8&useSSL=false
+    #url: jdbc:mysql://175.178.184.40:3344/godwealth?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&autoReconnect=true&allowMultiQueries=true
+    url: jdbc:mysql://localhost:3306/godwealth?useUnicode=true&characterEncoding=utf8&useSSL=false
+
     username: root
-    password: 123456
+    password: 1990@linhongfei
     #1990@linhongfei
+    #123456
     druid:
       initial-size: 1 #初始化连接数
       min-idle: 1 #最小空闲连接
       max-active: 20 #最大活动连接
       test-on-borrow: true
       stat-view-servlet:
-        allow: true
+      allow: true
     hikari:
       connection-timeout: 10000
 #  rabbitmq:

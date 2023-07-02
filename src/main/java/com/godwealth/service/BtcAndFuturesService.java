@@ -1,8 +1,10 @@
 package com.godwealth.service;
 
+import com.godwealth.entity.BtcEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 /**
  *
@@ -14,5 +16,5 @@ public interface BtcAndFuturesService {
 
     Map<String,Object> getBtc();
 
-    Map<String,Object> getFutures() throws IOException;
+    List<BtcEntity> getFutures() throws IOException;
 }
