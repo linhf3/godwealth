@@ -1,11 +1,12 @@
 package com.godwealth.controller;
 
-import com.godwealth.service.BtcService;
+import com.godwealth.service.BtcAndFuturesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -17,10 +18,15 @@ import java.util.Map;
 @RequestMapping("/btc")
 public class BtcController {
     @Autowired
-    private BtcService btcService;
+    private BtcAndFuturesService btcAndFuturesService;
 
     @GetMapping("/getBtc")
     public Map<String,Object> getBtc(){
-        return btcService.getBtc();
+        return btcAndFuturesService.getBtc();
+    }
+
+    @GetMapping("/getFutures")
+    public Map<String,Object> getFutures() throws IOException {
+        return btcAndFuturesService.getFutures();
     }
 }

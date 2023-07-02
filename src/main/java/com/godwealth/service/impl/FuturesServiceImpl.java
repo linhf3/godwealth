@@ -516,7 +516,7 @@ public class FuturesServiceImpl implements FuturesService {
             System.out.println(list.toArray());
             list.forEach(map -> {
                 String name = (String) map.get("name");
-                //if (name.contains("主力") && !name.contains("次")) {
+                if (name.contains("主") && !name.contains("次")) {
                 StockCode stockCode = new StockCode();
                 if ("103".equals(s)) {
                     name = new StringBuilder(name).append("(美)").toString();
@@ -533,7 +533,7 @@ public class FuturesServiceImpl implements FuturesService {
                 stockCode.setAddUser("admin");
                 stockCode.setAddDate(new Date());
                 stockCodeLinkedList.add(stockCode);
-                // }
+                 }
             });
         });
         List<StockCode> stockCodes = new LinkedList<>();

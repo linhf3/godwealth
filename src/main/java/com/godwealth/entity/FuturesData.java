@@ -9,9 +9,14 @@ public class FuturesData implements Serializable {
 
     private String exchangeCode;
 
+    private String sts;
+
     private String data;
 
     private static final long serialVersionUID = 1L;
+
+    public FuturesData() {
+    }
 
     public Integer getId() {
         return id;
@@ -43,5 +48,13 @@ public class FuturesData implements Serializable {
 
     public void setData(String data) {
         this.data = data == null ? null : data.trim();
+    }
+
+    public String getSts() {
+        return sts;
+    }
+
+    public void setSts(String sts) {
+        this.sts = sts;
     }
 }

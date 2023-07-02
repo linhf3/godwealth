@@ -163,6 +163,19 @@
             <version>3.8.2</version>
         </dependency>
 
+        <!--        企业微信配置依赖-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-cp</artifactId>
+            <version>4.0.8.B</version>
+        </dependency>
+        <!--        redis依赖-->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+
     </dependencies>
 
 <!--     编译 -->

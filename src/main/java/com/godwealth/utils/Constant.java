@@ -51,6 +51,9 @@ public class Constant {
 
 
 
+    //btc东方财富一分钟，当日交易 2023-06-30 21:02,7386,7390,7380,7379.5 时间 - 收盘价-最高价-最低价-均价
+    public static final String URL = "http://push2.eastmoney.com/api/qt/stock/trends2/get?secid=${secid}&fields1=f5%2Cf8%2Cf17&fields2=f51%2Cf53%2Cf54%2Cf55%2Cf58";
+
 
 
 }

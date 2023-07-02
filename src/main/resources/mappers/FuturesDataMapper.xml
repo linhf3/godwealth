@@ -5,12 +5,13 @@
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="exchange_code" property="exchangeCode" jdbcType="VARCHAR"/>
+        <result column="sts" property="sts" jdbcType="VARCHAR"/>
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="com.godwealth.entity.FuturesData" extends="BaseResultMap">
         <result column="data" property="data" jdbcType="LONGVARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
-    id, name, exchange_code
+    id, name, exchange_code,sts
   </sql>
     <sql id="Blob_Column_List">
     data
@@ -37,9 +38,9 @@
   </delete>
     <insert id="insert" parameterType="com.godwealth.entity.FuturesData">
     insert into futures_data (id, name, exchange_code, 
-      data)
+      data,sts)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{exchangeCode,jdbcType=VARCHAR}, 
-      #{data,jdbcType=LONGVARCHAR})
+      #{data,jdbcType=LONGVARCHAR}, #{sts,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="com.godwealth.entity.FuturesData">
         insert into futures_data
@@ -56,6 +57,9 @@
             <if test="data != null">
                 data,
             </if>
+            <if test="sts != null">
+                sts,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -69,6 +73,9 @@
             </if>
             <if test="data != null">
                 #{data,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="sts != null">
+                #{sts,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -84,6 +91,9 @@
             <if test="data != null">
                 data = #{data,jdbcType=LONGVARCHAR},
             </if>
+            <if test="sts != null">
+                sts = #{sts,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id,jdbcType=INTEGER}
     </update>
@@ -91,13 +101,15 @@
     update futures_data
     set name = #{name,jdbcType=VARCHAR},
       exchange_code = #{exchangeCode,jdbcType=VARCHAR},
-      data = #{data,jdbcType=LONGVARCHAR}
+      data = #{data,jdbcType=LONGVARCHAR},
+      sts = #{sts,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
     <update id="updateByPrimaryKey" parameterType="com.godwealth.entity.FuturesData">
     update futures_data
     set name = #{name,jdbcType=VARCHAR},
-      exchange_code = #{exchangeCode,jdbcType=VARCHAR}
+      exchange_code = #{exchangeCode,jdbcType=VARCHAR},
+      sts = #{sts,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
     <select id="selectAll" resultMap="ResultMapWithBLOBs">
@@ -110,9 +122,16 @@
     <insert id="insertList" parameterType="java.util.List">
         insert into
         futures_data (name, exchange_code,
-        data) values
+        data,sts) values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.name},#{item.exchangeCode},#{item.data})
+            (#{item.name},#{item.exchangeCode},#{item.data},#{item.sts})
         </foreach>
     </insert>
+    <select id="selectSts" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from futures_data where sts = '1';
+    </select>
 </mapper>

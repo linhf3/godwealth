@@ -3,6 +3,7 @@ package com.godwealth.dao;
 import com.godwealth.entity.FuturesData;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public interface FuturesDataMapper {
@@ -25,4 +26,6 @@ public interface FuturesDataMapper {
     int insertList(List<FuturesData> record);
 
     FuturesData selectByExchangeCode(@Param("exchangeCode") String exchangeCode);
+
+    LinkedList<FuturesData> selectSts();
 }
