@@ -62,7 +62,8 @@ public class FuturesCoreAlgorithm implements CoreAlgorithm {
             if (j == trendsList.size() - 1) {
                 curentNum = Math.abs(f1);
                 reMap.put("price", s1);
-                double prePrice = Double.valueOf(String.valueOf(map.get("prePrice")));
+                List<Map<String,Object>> hisPrePrices = (List<Map<String, Object>>) map.get("hisPrePrices");
+                double prePrice = Double.valueOf(String.valueOf(hisPrePrices.get(0).get("prePrice")));
                 BigDecimal s4 = new BigDecimal((s1 - prePrice) * 100 / prePrice);
                 double f2 = s4.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
                 if (s1 < s2) {

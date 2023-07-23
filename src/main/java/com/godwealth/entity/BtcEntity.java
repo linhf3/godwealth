@@ -24,6 +24,10 @@ public class BtcEntity implements Comparable<BtcEntity>{
     private String xz;
     //点差
     private double dc;
+    //当日偏离
+    private String proportion;
+    //当日偏离绝对值是否大于等于90：1 是，0 否
+    private String proportionAbs;
 
     @Override
     public int compareTo(BtcEntity o) {
